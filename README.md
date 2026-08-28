@@ -12,7 +12,27 @@ Deterministic bottom-up relational computing framework for multi-agent governanc
 
 ---
 
-## Core Modules (`src/`)
+## Axiomatic Foundation: The 11 Fundamental Laws
+
+The runtime, equations, and translation protocols are rigorous computational implementations of the **11 Fundamental Laws of Fragment Mechanics** (v1.0 — 28/08/2026):
+
+1. **Law of INFINITY:** Reality consists of infinite continuous fragments.
+2. **Law of Recursive Fragmentation:** No terminal scale or irreducible static particle.
+3. **Law of Dependence & Exchanges:** Persistence is sustained exclusively by field exchanges.
+4. **Fragment-Field Law:** Duality of scale; every field is a fragment and vice versa.
+5. **Law of Proper Equilibrium:** Homeostasis as dynamic compatibility of flows.
+6. **Law of Non-Identity:** Distinct entities have at least one real differential trace.
+7. **Law of Proper Time ($d\tau$):** Time is the local rate of structural transformation.
+8. **Law of Universality:** Invariant mechanics underlying all physical/semiotic phenomena.
+9. **Law of Consequences:** Every real difference generates propagating transformations.
+10. **Law of Transformation:** Strict conservation; state redistribution without magic deletion.
+11. **Law of Boundaries ($M_C$):** Boundaries are themselves permeable, active interface fragments.
+
+> *Full axiomatic formulation available in [`docs/THE_11_FUNDAMENTAL_LAWS.md`](docs/THE_11_FUNDAMENTAL_LAWS.md).*
+
+---
+
+## Core Architecture (`src/`)
 
 * **`core.py`:** 6 primitive invariant equations, antisymmetric tanh flows, local proper time ($d\tau$), and stress-induced force inversion $(1 - \beta R_i)$.
 * **`membrane.py`:** Emergent boundary persistence metric ($M_C$) evaluating topological cohesion.
