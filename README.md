@@ -1,13 +1,13 @@
 # PHI-INFINITY (Phi-Infinity) Computational Runtime
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22144525.svg)](https://doi.org/10.5281/zenodo.22144525)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22150329.svg)](https://doi.org/10.5281/zenodo.22150329)
 [![GitHub License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 Deterministic bottom-up relational computing framework for multi-agent governance, invariant substrates, emergent boundary persistence, and anti-hallucination semantic bridging.
 
 **Author:** Massimiliano Brighindi  
-**Edition:** Integral Blueprint 2026 (v1.1.0)  
-**Version DOI:** [10.5281/zenodo.22144525](https://doi.org/10.5281/zenodo.22144525)  
+**Edition:** Integral Blueprint 2026 (v1.2.0)  
+**Version DOI:** [10.5281/zenodo.22150329](https://doi.org/10.5281/zenodo.22150329)  
 **Concept DOI:** [10.5281/zenodo.22143113](https://doi.org/10.5281/zenodo.22143113)
 
 ---
@@ -56,14 +56,14 @@ python demo.py
 ## Citation & Reference
 
 ```bibtex
-@software{brighindi2026phi_infinity_v110,
+@software{brighindi2026phi_infinity_v120,
   author       = {Brighindi, Massimiliano},
-  title        = {PHI-INFINITY (Phi-Infinity) Computational Runtime: Deterministic Substrate Invariant Engine & Universal Translator},
+  title        = {PHI-INFINITY (Phi-Infinity) Computational Runtime: Deterministic Substrate Invariant Engine, 11 Fundamental Laws & Universal Translator},
   year         = {2026},
-  version      = {1.1.0},
+  version      = {1.2.0},
   publisher    = {Zenodo},
-  doi          = {10.5281/zenodo.22144525},
-  url          = {[https://doi.org/](https://doi.org/)10.5281/zenodo.22144525}
+  doi          = {10.5281/zenodo.22150329},
+  url          = {[https://doi.org/](https://doi.org/)10.5281/zenodo.22150329}
 }
 ```
 
