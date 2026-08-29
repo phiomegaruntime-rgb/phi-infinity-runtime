@@ -193,3 +193,63 @@ The native equations in `src/core.py` and `src/membrane.py` remain
 unchanged.
 
 <!-- PHI-BOUNDARY-END -->
+
+<!-- PHI-RELEVANCE-BEGIN -->
+
+## Fragment-Driven Relevance
+
+PHI-INFINITY does not require exhaustive reconstruction of every
+antecedent in reality before a fragment can be studied.
+
+For the current transformation, reconstruction follows the fragment's
+actual exchanges:
+
+\[
+\text{fragment}
+\rightarrow
+\text{what reaches it}
++
+\text{what it sends outward}
+\]
+
+An additional accessible difference is followed when it changes a
+distinguishable continuation of the focal fragment.
+
+Operationally:
+
+\[
+\Delta X
+\rightarrow
+\Delta F
+\Rightarrow
+\text{EXPAND}
+\]
+
+while:
+
+\[
+\Delta X
+\not\rightarrow
+\Delta F
+\Rightarrow
+\text{STOP EXPANSION FOR THE CURRENT TRANSFORMATION}
+\]
+
+This is not a claim that the surrounding reality does not exist, or
+that a currently irrelevant relation can never become relevant later.
+
+If the required exterior consequence is not yet resolved:
+
+\[
+\text{REQUIRE MORE ACCESS}
+\]
+
+rather than silently replacing the missing contribution with zero.
+
+The same relation is inspected bidirectionally: consequences reaching
+the focal fragment and consequences produced by the focal fragment
+toward its surroundings.
+
+The native PHI dynamics remain unchanged.
+
+<!-- PHI-RELEVANCE-END -->
