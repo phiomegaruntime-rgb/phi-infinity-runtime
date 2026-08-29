@@ -194,62 +194,68 @@ unchanged.
 
 <!-- PHI-BOUNDARY-END -->
 
+
 <!-- PHI-RELEVANCE-BEGIN -->
 
-## Fragment-Driven Relevance
+## Consequence Preservation
 
-PHI-INFINITY does not require exhaustive reconstruction of every
-antecedent in reality before a fragment can be studied.
+PHI-INFINITY does not equate small numerical magnitude with
+irrelevance.
 
-For the current transformation, reconstruction follows the fragment's
-actual exchanges:
-
-\[
-\text{fragment}
-\rightarrow
-\text{what reaches it}
-+
-\text{what it sends outward}
-\]
-
-An additional accessible difference is followed when it changes a
-distinguishable continuation of the focal fragment.
-
-Operationally:
+The operational rule is:
 
 \[
-\Delta X
-\rightarrow
-\Delta F
+\Delta \neq 0
 \Rightarrow
-\text{EXPAND}
+\text{preserve the consequence}
 \]
 
-while:
+Every represented accessible consequence is retained and composed
+with the others before continuation is evaluated.
+
+A numerical tolerance may describe the limits of current
+computation, but it must never become a statement that a real
+difference has no consequence.
+
+Therefore:
 
 \[
-\Delta X
-\not\rightarrow
-\Delta F
-\Rightarrow
-\text{STOP EXPANSION FOR THE CURRENT TRANSFORMATION}
+\text{below current numerical resolution}
+\neq
+\text{irrelevant}
 \]
 
-This is not a claim that the surrounding reality does not exist, or
-that a currently irrelevant relation can never become relevant later.
-
-If the required exterior consequence is not yet resolved:
+and:
 
 \[
-\text{REQUIRE MORE ACCESS}
+\text{unresolved}
+\neq
+0
 \]
 
-rather than silently replacing the missing contribution with zero.
+If a real exterior source is present but its effect collapses to zero
+in the current numerical representation, the runtime explicitly
+reports:
 
-The same relation is inspected bidirectionally: consequences reaching
-the focal fragment and consequences produced by the focal fragment
-toward its surroundings.
+`PRESERVE_BELOW_CURRENT_NUMERICAL_RESOLUTION`
 
-The native PHI dynamics remain unchanged.
+rather than discarding the source.
+
+If the consequence itself remains unresolved:
+
+`REQUIRE_MORE_ACCESS`
+
+The controller also prevents per-source threshold pruning. Many small
+consequences are composed before the resulting continuation is
+evaluated.
+
+This avoids turning a computational threshold into a version of the
+sorites ("heap") paradox.
+
+The continuous PHI quantity may change gradually even when a later
+human-facing classification crosses a named boundary.
+
+The native PHI mechanics remain unchanged.
 
 <!-- PHI-RELEVANCE-END -->
+

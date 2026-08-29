@@ -1,20 +1,29 @@
 
 """
 PHI-INFINITY
-Fragment-Driven Relevance Controller
+Consequence-Preserving Fragment Controller
 
-A fragment does not require reconstruction of every causal
-antecedent in reality.
+Fundamental rule:
 
-For the current transformation, an accessible external difference
-is followed only when it changes a distinguishable continuation of
-the focal fragment.
+    every represented real difference is preserved.
 
-The same field relation is also inspected in the opposite direction:
-what reaches the fragment and what the fragment sends back.
+No numerical magnitude threshold is allowed to become an
+ontological relevance rule.
 
-No claim is made that a branch which is irrelevant now can never
-become relevant later.
+For every accessible exterior fragment:
+
+    - represented consequence
+        -> preserve and compose;
+
+    - real source present but consequence below current
+      numerical representation
+        -> preserve the unresolved distinguishability fact;
+
+    - unresolved consequence
+        -> require more access.
+
+All accessible represented consequences are composed before
+the focal continuation is evaluated.
 
 Author: Massimiliano Brighindi (2026)
 """
@@ -29,25 +38,21 @@ from src.boundary import (
     BoundaryEffectReceipt,
     boundary_receipt_from_parent,
     combine_boundary_receipts,
-    step_with_boundary,
-    evaluate_cluster_with_boundary,
 )
 
 
 # ============================================================
-# RESULT
+# CONSEQUENCE DECISION
 # ============================================================
 
 @dataclass(frozen=True)
-class RelevanceDecision:
+class ConsequenceDecision:
 
     status: str
 
-    state_delta: float
+    represented_magnitude: float
 
-    membrane_delta: float
-
-    membrane_status_changed: bool
+    source_present: bool
 
     reason: str
 
@@ -60,21 +65,38 @@ def clone_engine(
     engine,
 ):
     """
-    Exact local runtime copy.
+    Exact runtime-state copy.
 
     No new dynamics are introduced.
     """
 
     clone = PhiSubstrateEngine(
-        n_nodes=engine.N,
-        sigma=engine.sigma,
-        alpha=engine.alpha,
-        beta=engine.beta,
-        lmbda=engine.lmbda,
-        gamma=engine.gamma,
-        mu=engine.mu,
-        eta=engine.eta,
-        seed=1,
+        n_nodes=
+            engine.N,
+
+        sigma=
+            engine.sigma,
+
+        alpha=
+            engine.alpha,
+
+        beta=
+            engine.beta,
+
+        lmbda=
+            engine.lmbda,
+
+        gamma=
+            engine.gamma,
+
+        mu=
+            engine.mu,
+
+        eta=
+            engine.eta,
+
+        seed=
+            1,
     )
 
     clone.pos = np.copy(
@@ -93,7 +115,7 @@ def clone_engine(
 
 
 # ============================================================
-# BIDIRECTIONAL REAL EXCHANGE
+# SAME REAL RELATION — BOTH DIRECTIONS
 # ============================================================
 
 def bidirectional_exchange(
@@ -102,15 +124,11 @@ def bidirectional_exchange(
     other_indices,
 ):
     """
-    Inspect the same relation in both directions.
-
     incoming:
-        consequences produced by the surrounding fragment
-        that reach the focal fragment.
+        consequences produced outside that reach the focal fragment
 
     outgoing:
-        consequences produced by the focal fragment
-        that reach the surrounding fragment.
+        consequences produced by the focal fragment that reach outside
     """
 
     incoming = (
@@ -139,45 +157,182 @@ def bidirectional_exchange(
 
 
 # ============================================================
-# DISTINGUISHABILITY
+# REPRESENTED MAGNITUDE
 # ============================================================
 
-def _maximum_state_difference(
-    engine_a,
-    engine_b,
+def _receipt_magnitude(
+    receipt,
 ):
 
-    return float(
-        max(
-            np.max(
-                np.abs(
-                    engine_a.pos
-                    -
-                    engine_b.pos
-                )
-            ),
+    arrays = [
+        np.asarray(
+            receipt.flow_e,
+            dtype=np.float64,
+        ),
 
-            np.max(
-                np.abs(
-                    engine_a.S
-                    -
-                    engine_b.S
-                )
-            ),
+        np.asarray(
+            receipt.flow_r,
+            dtype=np.float64,
+        ),
 
+        np.asarray(
+            receipt.geometry,
+            dtype=np.float64,
+        ),
+
+        np.asarray(
+            receipt.coupling_mass,
+            dtype=np.float64,
+        ),
+    ]
+
+    maxima = [
+        float(
             np.max(
                 np.abs(
-                    engine_a.R
-                    -
-                    engine_b.R
+                    array
                 )
-            ),
+            )
         )
+        if array.size
+        else 0.0
+        for array
+        in arrays
+    ]
+
+    return max(
+        maxima,
+        default=0.0,
     )
 
 
 # ============================================================
-# RELEVANCE OF ONE EXTERNAL DIFFERENCE
+# CONSEQUENCE PRESERVATION
+# ============================================================
+
+def assess_boundary_consequence(
+    candidate_receipt,
+    source_present=True,
+):
+    """
+    No significance threshold is applied.
+
+    A represented non-zero consequence is preserved regardless
+    of magnitude.
+
+    If a real exterior source is known to exist but the current
+    floating-point representation produces zero, the source is
+    NOT declared irrelevant.
+
+    It is explicitly marked as below current numerical resolution.
+    """
+
+    if not candidate_receipt.resolved:
+
+        return ConsequenceDecision(
+            status=
+                "REQUIRE_MORE_ACCESS",
+
+            represented_magnitude=
+                float("nan"),
+
+            source_present=
+                bool(
+                    source_present
+                ),
+
+            reason=
+                (
+                    "The exterior consequence is unresolved "
+                    "and is not replaced by zero."
+                ),
+        )
+
+
+    magnitude = (
+        _receipt_magnitude(
+            candidate_receipt
+        )
+    )
+
+
+    # ========================================================
+    # REAL SOURCE PRESENT
+    # ========================================================
+
+    if source_present:
+
+        if magnitude == 0.0:
+
+            return ConsequenceDecision(
+                status=
+                    (
+                        "PRESERVE_BELOW_CURRENT_"
+                        "NUMERICAL_RESOLUTION"
+                    ),
+
+                represented_magnitude=
+                    0.0,
+
+                source_present=
+                    True,
+
+                reason=
+                    (
+                        "A real exterior source is present, "
+                        "but its consequence is not numerically "
+                        "distinguishable in the current "
+                        "representation. It is not declared "
+                        "irrelevant."
+                    ),
+            )
+
+
+        return ConsequenceDecision(
+            status=
+                "PROPAGATE_REPRESENTED_CONSEQUENCE",
+
+            represented_magnitude=
+                magnitude,
+
+            source_present=
+                True,
+
+            reason=
+                (
+                    "The represented exterior consequence is "
+                    "preserved regardless of magnitude."
+                ),
+        )
+
+
+    # ========================================================
+    # NO SOURCE MATERIALIZED IN THIS RESOLVED SCOPE
+    #
+    # This is NOT a statement that nothing exists outside.
+    # ========================================================
+
+    return ConsequenceDecision(
+        status=
+            "NO_SOURCE_IN_THIS_RESOLVED_SCOPE",
+
+        represented_magnitude=
+            magnitude,
+
+        source_present=
+            False,
+
+        reason=
+            (
+                "No exterior source was supplied for this "
+                "resolved computational scope. This is not "
+                "a claim about the absence of surrounding reality."
+            ),
+    )
+
+
+# ============================================================
+# BACKWARD-COMPATIBLE ENTRY POINT
 # ============================================================
 
 def assess_boundary_relevance(
@@ -185,250 +340,88 @@ def assess_boundary_relevance(
     candidate_receipt,
     context_receipt=None,
     cluster_indices=None,
-    tolerance=1e-12,
+    tolerance=None,
+    source_present=True,
 ):
     """
-    Ask only:
+    Compatibility wrapper for the previous API.
 
-        Does this additional exterior difference change the
-        next distinguishable continuation of the fragment?
+    IMPORTANT:
 
-    Comparison:
+        tolerance is intentionally ignored.
 
-        already-known context
-
-    versus
-
-        already-known context + candidate exterior effect
-
-    This is a per-transformation decision.
-
-    It never means that a currently irrelevant branch is
-    irrelevant forever.
+    A numerical tolerance may describe computational
+    distinguishability, but it must never determine whether
+    a real consequence exists.
     """
 
-    if context_receipt is None:
-
-        context_receipt = (
-            BoundaryEffectReceipt
-            .resolved_zero(
-                local_engine.N
-            )
-        )
-
-
-    # --------------------------------------------------------
-    # Unknown outside is not zero.
-    # --------------------------------------------------------
-
-    if (
-        not context_receipt.resolved
-        or
-        not candidate_receipt.resolved
-    ):
-
-        return RelevanceDecision(
-            status=
-                "REQUIRE_MORE_ACCESS",
-
-            state_delta=
-                float("nan"),
-
-            membrane_delta=
-                float("nan"),
-
-            membrane_status_changed=
-                False,
-
-            reason=
-                (
-                    "The exterior consequence required "
-                    "for this transformation is not yet "
-                    "resolved."
-                ),
-        )
-
-
-    if cluster_indices is None:
-
-        cluster_indices = list(
-            range(
-                local_engine.N
-            )
-        )
-
-
-    # ========================================================
-    # SAME FRAGMENT, SAME STARTING REALITY
-    # ========================================================
-
-    baseline_engine = (
-        clone_engine(
-            local_engine
-        )
-    )
-
-    candidate_engine = (
-        clone_engine(
-            local_engine
-        )
-    )
-
-
-    expanded_receipt = (
-        combine_boundary_receipts(
-            context_receipt,
+    return assess_boundary_consequence(
+        candidate_receipt=
             candidate_receipt,
-        )
-    )
 
-
-    # ========================================================
-    # CURRENT MEMBRANE CONSEQUENCE
-    # ========================================================
-
-    baseline_membrane = (
-        evaluate_cluster_with_boundary(
-            baseline_engine,
-            cluster_indices,
-            context_receipt,
-            beta=baseline_engine.beta,
-        )
-    )
-
-    candidate_membrane = (
-        evaluate_cluster_with_boundary(
-            candidate_engine,
-            cluster_indices,
-            expanded_receipt,
-            beta=candidate_engine.beta,
-        )
-    )
-
-
-    baseline_mc = (
-        baseline_membrane[
-            "M_C_upper"
-        ]
-    )
-
-    candidate_mc = (
-        candidate_membrane[
-            "M_C_upper"
-        ]
-    )
-
-
-    membrane_delta = float(
-        abs(
-            candidate_mc
-            -
-            baseline_mc
-        )
-    )
-
-
-    membrane_status_changed = (
-        baseline_membrane[
-            "status"
-        ]
-        !=
-        candidate_membrane[
-            "status"
-        ]
-    )
-
-
-    # ========================================================
-    # NEXT TRANSFORMATION
-    # ========================================================
-
-    step_with_boundary(
-        baseline_engine,
-        context_receipt,
-    )
-
-    step_with_boundary(
-        candidate_engine,
-        expanded_receipt,
-    )
-
-
-    state_delta = (
-        _maximum_state_difference(
-            baseline_engine,
-            candidate_engine,
-        )
-    )
-
-
-    # ========================================================
-    # DECISION
-    # ========================================================
-
-    relevant = (
-        state_delta
-        > tolerance
-
-        or
-
-        membrane_delta
-        > tolerance
-
-        or
-
-        membrane_status_changed
-    )
-
-
-    if relevant:
-
-        return RelevanceDecision(
-            status=
-                "EXPAND_THIS_TRANSFORMATION",
-
-            state_delta=
-                state_delta,
-
-            membrane_delta=
-                membrane_delta,
-
-            membrane_status_changed=
-                membrane_status_changed,
-
-            reason=
-                (
-                    "The accessible exterior difference "
-                    "changes a distinguishable continuation "
-                    "of the focal fragment."
-                ),
-        )
-
-
-    return RelevanceDecision(
-        status=
-            "STOP_EXPANSION_THIS_TRANSFORMATION",
-
-        state_delta=
-            state_delta,
-
-        membrane_delta=
-            membrane_delta,
-
-        membrane_status_changed=
-            membrane_status_changed,
-
-        reason=
-            (
-                "The accessible exterior difference does "
-                "not change the fragment's distinguishable "
-                "continuation in this transformation."
-            ),
+        source_present=
+            source_present,
     )
 
 
 # ============================================================
-# EXAMINE THE CURRENTLY ACCESSIBLE SURROUNDING FIELD
+# COMPOSE ALL ACCESSIBLE CONSEQUENCES
+# ============================================================
+
+def compose_accessible_consequences(
+    receipts,
+):
+    """
+    Preserve composition.
+
+    No consequence is removed because it is individually small.
+
+    If even one required consequence is unresolved, the aggregate
+    remains unresolved.
+    """
+
+    receipts = list(
+        receipts
+    )
+
+    if not receipts:
+
+        raise ValueError(
+            "At least one accessible consequence is required."
+        )
+
+
+    if any(
+        not receipt.resolved
+        for receipt
+        in receipts
+    ):
+
+        n_local = len(
+            np.asarray(
+                receipts[
+                    0
+                ].flow_e
+            )
+        )
+
+        return (
+            BoundaryEffectReceipt
+            .unresolved(
+                n_local
+            )
+        )
+
+
+    return (
+        combine_boundary_receipts(
+            *receipts
+        )
+    )
+
+
+# ============================================================
+# SCAN ACCESSIBLE SURROUNDINGS
 # ============================================================
 
 def scan_accessible_environment(
@@ -436,24 +429,27 @@ def scan_accessible_environment(
     focal_indices,
     context_indices=None,
     candidate_indices=None,
-    tolerance=1e-12,
+    tolerance=None,
 ):
     """
-    Starting from the focal fragment:
+    Inspect the currently accessible surrounding fragments.
 
-        1. preserve already-established surrounding effects;
-        2. inspect each additional accessible surrounding fragment;
-        3. record what reaches the focal fragment;
-        4. record what the focal fragment sends back;
-        5. continue only where a difference changes continuation.
+    NO branch is stopped because its consequence is small.
 
-    No pre-defined hierarchy is required.
+    Every represented incoming consequence is retained in the
+    aggregate.
+
+    A branch that numerically collapses to zero while a real source
+    is present remains explicitly represented as below the current
+    numerical resolution.
+
+    tolerance is accepted only for backward API compatibility
+    and is intentionally unused.
     """
 
     focal_indices = list(
         focal_indices
     )
-
 
     focal_set = set(
         focal_indices
@@ -479,15 +475,17 @@ def scan_accessible_environment(
     if candidate_indices is None:
 
         candidate_indices = [
-            i
-            for i
+            index
+            for index
             in range(
                 parent_engine.N
             )
             if (
-                i not in focal_set
+                index
+                not in focal_set
                 and
-                i not in context_set
+                index
+                not in context_set
             )
         ]
 
@@ -498,47 +496,9 @@ def scan_accessible_environment(
         )
 
 
-    # --------------------------------------------------------
-    # Local fragment
-    # --------------------------------------------------------
-
-    local_engine = PhiSubstrateEngine(
-        n_nodes=len(
-            focal_indices
-        ),
-        sigma=parent_engine.sigma,
-        alpha=parent_engine.alpha,
-        beta=parent_engine.beta,
-        lmbda=parent_engine.lmbda,
-        gamma=parent_engine.gamma,
-        mu=parent_engine.mu,
-        eta=parent_engine.eta,
-        seed=1,
-    )
-
-
-    local_engine.pos = np.copy(
-        parent_engine.pos[
-            focal_indices
-        ]
-    )
-
-    local_engine.S = np.copy(
-        parent_engine.S[
-            focal_indices
-        ]
-    )
-
-    local_engine.R = np.copy(
-        parent_engine.R[
-            focal_indices
-        ]
-    )
-
-
-    # --------------------------------------------------------
-    # Already-established surrounding context
-    # --------------------------------------------------------
+    # ========================================================
+    # ALREADY ACCESSIBLE CONTEXT
+    # ========================================================
 
     if context_indices:
 
@@ -552,6 +512,12 @@ def scan_accessible_environment(
 
     else:
 
+        # ----------------------------------------------------
+        # Arithmetic identity only.
+        #
+        # NOT an ontological claim that reality outside is zero.
+        # ----------------------------------------------------
+
         context_receipt = (
             BoundaryEffectReceipt
             .resolved_zero(
@@ -562,8 +528,16 @@ def scan_accessible_environment(
         )
 
 
-    results = []
+    branches = []
 
+    incoming_receipts = [
+        context_receipt
+    ]
+
+
+    # ========================================================
+    # EVERY ACCESSIBLE SOURCE IS PRESERVED
+    # ========================================================
 
     for candidate_index in (
         candidate_indices
@@ -581,32 +555,23 @@ def scan_accessible_environment(
 
 
         decision = (
-            assess_boundary_relevance(
-                local_engine=
-                    local_engine,
-
-                candidate_receipt=
-                    exchange[
-                        "incoming"
-                    ],
-
-                context_receipt=
-                    context_receipt,
-
-                cluster_indices=
-                    list(
-                        range(
-                            local_engine.N
-                        )
-                    ),
-
-                tolerance=
-                    tolerance,
+            assess_boundary_consequence(
+                exchange[
+                    "incoming"
+                ],
+                source_present=True,
             )
         )
 
 
-        results.append(
+        incoming_receipts.append(
+            exchange[
+                "incoming"
+            ]
+        )
+
+
+        branches.append(
             {
                 "candidate_index":
                     candidate_index,
@@ -627,4 +592,22 @@ def scan_accessible_environment(
         )
 
 
-    return results
+    # ========================================================
+    # ALL REPRESENTED CONSEQUENCES ARE COMPOSED
+    # BEFORE THE CONTINUATION IS EVALUATED.
+    # ========================================================
+
+    aggregate_incoming = (
+        compose_accessible_consequences(
+            incoming_receipts
+        )
+    )
+
+
+    return {
+        "branches":
+            branches,
+
+        "aggregate_incoming":
+            aggregate_incoming,
+    }
