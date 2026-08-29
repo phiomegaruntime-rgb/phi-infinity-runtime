@@ -72,3 +72,64 @@ python demo.py
 ## License
 
 (c) 2026 Massimiliano Brighindi. Released under the MIT License.
+
+<!-- PHI-OMNIA-BEGIN -->
+
+## OMNIA: Ambiguity Without Forced Selection
+
+The inverse bridge does not assume that the numerically best
+compatible latent state is the real one.
+
+For accessible observation bases \(B_1,\ldots,B_n\):
+
+\[
+\mathcal Z_{\mathrm{OMNIA}}
+=
+\bigcap_i
+\mathcal Z(B_i)
+\]
+
+Operationally, every candidate genealogy must remain compatible
+with every currently accessible basis.
+
+OMNIA does **not** use majority voting or semantic weighting.
+
+The surviving genealogies are then continued through the native
+PHI runtime.
+
+If no compatible genealogy is found:
+
+`UNRESOLVED_IN_SEARCH_DOMAIN`
+
+If one observable continuation class remains:
+
+`ONE_CONTINUATION_CLASS_WITHIN_EXPLORED_SEARCH_DOMAIN`
+
+If multiple PHI-distinguishable continuation classes remain:
+
+`UNKNOWN_AMBIGUOUS_UNDER_CURRENT_ACCESS`
+
+Therefore:
+
+\[
+\text{compatibility} \neq \text{uniqueness}
+\]
+
+and:
+
+\[
+|\mathcal Z/\sim_\Phi|>1
+\Rightarrow
+UNKNOWN
+\]
+
+The current implementation supports aligned positional observation
+bases. Extension to heterogeneous sources requires a future
+observation interface and must not introduce human semantic mappings
+into PHI state variables or dynamics.
+
+The numerical search is finite. A single discovered continuation
+class means one class **within the explored search domain**, not
+proof of global latent uniqueness.
+
+<!-- PHI-OMNIA-END -->
