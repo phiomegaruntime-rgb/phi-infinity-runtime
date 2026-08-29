@@ -133,3 +133,63 @@ class means one class **within the explored search domain**, not
 proof of global latent uniqueness.
 
 <!-- PHI-OMNIA-END -->
+
+<!-- PHI-BOUNDARY-BEGIN -->
+
+## INFINITY → Field → Fragment
+
+A local computational scope is not treated as the boundary of reality.
+
+PHI-INFINITY therefore distinguishes:
+
+\[
+\text{computational boundary}
+\neq
+\text{real boundary}
+\]
+
+A containing field does not need to be copied entirely into a local
+fragment. It transmits only the consequences that actually reach the
+fragment during the current transformation.
+
+Conceptually:
+
+\[
+\Omega
+\rightarrow
+F_1
+\rightarrow
+F_2
+\rightarrow
+\dots
+\rightarrow
+F_n
+\]
+
+Each level may transmit boundary consequences to the next.
+
+Multiple containing shells compose additively.
+
+If the relevant exterior contribution remains unresolved, the runtime
+must not silently replace it with zero.
+
+Therefore:
+
+\[
+\text{not accessible}
+\neq
+0
+\]
+
+For dynamic continuation, unresolved exterior effects cause explicit
+abstention.
+
+For membrane evaluation, an unresolved exterior cannot justify
+persistence. A dissolution conclusion may still be guaranteed when
+the currently known exterior already forces the upper bound of
+\(M_C\) to be at or below 1.
+
+The native equations in `src/core.py` and `src/membrane.py` remain
+unchanged.
+
+<!-- PHI-BOUNDARY-END -->
