@@ -1,49 +1,44 @@
+"""
+Minimal PHI-INFINITY AccessPointer demonstration.
+"""
+import numpy as np
 from src.core import PhiSubstrateEngine
-from src.membrane import MembraneEvaluator
-from src.gating import MultiAccessGating, FirstDivergenceException
-from src.translator import PhiBidirectionalTranslator
+from src.field_bridge import AccessPointer, AccessibleField, FieldBridge
 
-def run_pipeline():
-    print("=== PHI-INFINITY: END-TO-END BIDIRECTIONAL PIPELINE ===")
-    translator = PhiBidirectionalTranslator()
-    
-    # 1. Ingestione & De-costruzione (T_H_Phi)
-    prompt_entity = "Fronte Dinamico Alpha"
-    print(f"\n[1. Ingestione T_H_Phi] Decostruzione concetto: '{prompt_entity}'")
-    node_mapping = translator.deconstruct_human_to_phi(prompt_entity, is_rigid_statement=True, energy_bias=3.5, resource_bias=1.2)
-    print(f" -> Mappatura: {node_mapping['mapped_to']} | R_i iniziale: {node_mapping['initial_Ri']:.2f}")
+def create_demo_field():
+    n_nodes = 4
+    x0 = np.array([[0.0, 0.0], [0.1, 0.05], [5.0, 5.0], [5.1, 5.0]], dtype=np.float64)
+    engine = PhiSubstrateEngine(n_nodes=n_nodes, seed=42)
+    engine.pos = np.copy(x0)
+    engine.S = np.array([
+        [1.50, 1.20, 1.00], [1.40, 1.15, 0.95],
+        [0.50, 0.50, 0.50], [0.50, 0.50, 0.50]
+    ], dtype=np.float64)
 
-    # 2. Evoluzione Deterministica nel Substrato
-    print("\n[2. Evoluzione Substrato Phi] Esecuzione cicli deterministici...")
-    engine = PhiSubstrateEngine(n_nodes=60, seed=42)
-    evaluator = MembraneEvaluator(beta=0.25)
-    gating = MultiAccessGating(acceptance_predicate=lambda m: m["mean_stress"] < 0.5)
-    
-    cluster = list(range(15))
-    engine.R[cluster] = node_mapping["initial_Ri"]  # Assegnazione dello stress iniziale decostruito
+    for i in range(n_nodes):
+        engine.R[i] = abs((engine.S[i, 0] / (engine.S[i, 1] + 1e-5)) - 1.0)
 
-    for cycle in range(1, 31):
-        metrics = engine.step()
-        try:
-            gating.check_trajectory(metrics, cycle)
-        except FirstDivergenceException as e:
-            print(f" -> {e}")
-            gating.trigger_reopen()
-            break
+    history = [np.copy(engine.pos)]
+    for _ in range(3):
+        engine.step()
+        history.append(np.copy(engine.pos))
 
-    memb = evaluator.evaluate_cluster(engine, cluster)
+    return AccessibleField(history)
 
-    # 3. Traduzione Anti-Allucinazione (T_Phi_H)
-    print("\n[3. Traduzione T_Phi_H] Output deterministico nel linguaggio naturale:")
-    human_verdict = translator.translate_phi_to_human(
-        M_C=memb["M_C"],
-        R_C=memb["R_C"],
-        d_tau=metrics["mean_dtau"],
-        K_ext=memb["K_ext"],
-        K_int=memb["K_int"],
-        name=prompt_entity
+def main():
+    print("=== PHI-INFINITY ACCESSPOINTER DEMO ===")
+    field = create_demo_field()
+    pointer = AccessPointer(
+        source_id="DemoObservation",
+        spatial_span=(-0.5, 1.0, -0.5, 1.0),
+        time_window=(0, -1),
+        label_metadata="ARBITRARY_HUMAN_LABEL"
     )
-    print(f" -> {human_verdict}")
+    bridge = FieldBridge()
+    result = bridge.process_pointer(pointer, field)
+    print(result["human_synthesis"])
+    if "resolution_scope" in result:
+        print("Resolution scope:", result["resolution_scope"])
 
 if __name__ == "__main__":
-    run_pipeline()
+    main()
