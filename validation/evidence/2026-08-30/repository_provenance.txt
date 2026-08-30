@@ -1,0 +1,38 @@
+PHI-INFINITY VALIDATION PROVENANCE
+
+Date:
+2026-08-30
+
+Baseline Git commit:
+8e5749d8c719e73a0c4c19db3df0e7ec095c0200
+
+Baseline permanent pytest cases:
+22
+
+New permanent pytest cases:
+18
+
+Cumulative permanent pytest cases:
+40
+
+New permanent test files:
+- tests/test_flow_invariants.py
+- tests/test_temporal_semantic_antidrift.py
+- tests/test_recursive_scale_identity.py
+
+New-case breakdown:
+- Recursive Scale Identity: 12
+- Flow invariants: 4
+- Temporal semantic anti-drift: 2
+
+Runtime src modified:
+NO
+
+Pre-existing test files modified:
+NO
+
+RHO emergence reproducible validation:
+PASS
+
+Main demo:
+PASS

@@ -388,3 +388,36 @@ Canonical contract:
 
 `docs/UNIVERSAL_MOTHER_MECHANICS_CURRENT.md`
 <!-- PHI:README_UNIVERSAL_MECHANICS:END -->
+
+<!-- PHI:VALIDATION_LEDGER:START -->
+## Cumulative validation and falsification record
+
+PHI-INFINITY preserves validation work cumulatively.
+
+Permanent invariants are encoded in `tests/`.
+
+Reproducible non-runtime validation gates are stored in `validation/gates/`.
+
+Historical confirmed outputs, falsification sequence and interpretation
+limits are recorded under:
+
+`docs/validation/`
+
+Current ledger:
+
+`docs/validation/VALIDATION_LEDGER_CURRENT.md`
+
+Rule:
+
+\[
+\boxed{
+\text{NEW PHI CHANGE}
+\Rightarrow
+\text{MUST SURVIVE ALL PREVIOUS PERMANENT INVARIANTS}
+}
+\]
+
+A passing test does not prove universal PHI validity. It establishes only
+that the tested falsification route did not destroy the corresponding
+property.
+<!-- PHI:VALIDATION_LEDGER:END -->
