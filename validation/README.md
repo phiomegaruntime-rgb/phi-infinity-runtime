@@ -43,3 +43,27 @@ A passing gate means only that the specific attempted falsification did not
 destroy the tested PHI property.
 
 It does not imply universal proof of PHI-INFINITY.
+
+<!-- PHI:EMPIRICAL_GATES:START -->
+## Empirical Reality Gates
+
+Empirical Reality Gates are separate from permanent runtime regression.
+
+Alpha:
+
+`gates/empirical_reality_gate_alpha.py`
+
+Direct source tables:
+
+`data/empirical_reality_gate_alpha/`
+
+Actual execution evidence:
+
+`evidence/2026-08-30/empirical_reality_gate_alpha.txt`
+
+The preserved source tables are public-table transcriptions rather than
+original raw instrument files.
+
+A passing empirical gate establishes empirical compatibility for the tested
+families, not universal proof.
+<!-- PHI:EMPIRICAL_GATES:END -->

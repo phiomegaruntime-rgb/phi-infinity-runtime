@@ -292,3 +292,59 @@ The cumulative permanent suite is therefore now:
 }
 \]
 <!-- PHI:MECHANICAL_ADMISSIBILITY_AMENDMENT:END -->
+
+<!-- PHI:EMPIRICAL_REALITY_ALPHA:START -->
+## Empirical Reality Gate Alpha
+
+Alpha has now been executed successfully after source-table identity,
+structural-code and permanent-regression gates.
+
+Classification:
+
+`EMPIRICAL COMPATIBILITY / ADVERSARIAL VALIDATION`
+
+Directly reprocessed public tables:
+
+- cooling: 30 observations;
+- overdamped pendulum: 27 observations.
+
+Direct observations:
+
+`57`
+
+Deterministic statistical resampling workload:
+
+`6,000,000`
+
+This is explicitly not six million independent physical experiments.
+
+Permanent pytest remains:
+
+`42 / 42`
+
+Runtime source remains unchanged.
+
+Permanent regression tests remain unchanged.
+
+Cooling source SHA-256:
+
+`ed717d68d0bcfc4fd0cff77f3ec226b10ffe76b5997ac42ecbac1bde2aaf0e0c`
+
+Pendulum source SHA-256:
+
+`ae70376843f2171539fc08e8dc7fdc7dbd1da1b7c63722a454f75c3e793fde38`
+
+Executable:
+
+`validation/gates/empirical_reality_gate_alpha.py`
+
+Record:
+
+`docs/validation/EMPIRICAL_REALITY_GATE_ALPHA_2026-08-30.md`
+
+Current licensed conclusion:
+
+`NO SECOND FUNDAMENTAL CAUSAL OPERATION REQUIRED IN THESE EMPIRICAL FAMILIES`
+
+Universal proof is not claimed.
+<!-- PHI:EMPIRICAL_REALITY_ALPHA:END -->

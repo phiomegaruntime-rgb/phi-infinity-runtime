@@ -1,0 +1,71 @@
+==============================================================================
+PHI-INFINITY — EMPIRICAL REALITY GATE ALPHA
+==============================================================================
+
+--- Source-table identity ---
+Cooling : ed717d68d0bcfc4fd0cff77f3ec226b10ffe76b5997ac42ecbac1bde2aaf0e0c
+Pendulum: ae70376843f2171539fc08e8dc7fdc7dbd1da1b7c63722a454f75c3e793fde38
+✅ Transcribed empirical tables unchanged
+
+==============================================================================
+DIRECT EMPIRICAL GATE A — COOLING
+==============================================================================
+Observations: 30
+Decreasing intervals: 23
+Increasing intervals: 6
+Observed global slope: -1.216353726362625
+Negative bootstrap slopes: 1000000 / 1000000
+95% bootstrap slope interval: [-1.3373063482136047, -1.08362918464368]
+Correlation: field difference vs next change: 0.4572148575342927
+Positive correlation bootstraps: 998975 / 1000000
+Positive fraction: 0.998975
+95% correlation interval: [0.19563821610407992, 0.6558120239872752]
+Absolute-correlation permutation exceedances: 12851 / 1000000
+Permutation fraction: 0.012851
+✅ COOLING EMPIRICAL GATE PASS
+
+==============================================================================
+DIRECT EMPIRICAL GATE B — OVERDAMPED PENDULUM
+==============================================================================
+Observations: 27
+Decreasing intervals: 26 / 26
+Observed global slope: -2.4004158716788333
+Negative bootstrap slopes: 1000000 / 1000000
+95% bootstrap slope interval: [-2.7843434166015872, -1.9894962975032093]
+Correlation: present amplitude vs local loss rate: 0.8743796869111685
+Positive correlation bootstraps: 1000000 / 1000000
+Positive fraction: 1.0
+95% correlation interval: [0.7697374959803418, 0.9528562298045161]
+Absolute-correlation permutation exceedances: 0 / 1000000
+Permutation fraction: 0.0
+✅ OVERDAMPED PENDULUM EMPIRICAL GATE PASS
+
+==============================================================================
+EMPIRICAL REALITY GATE ALPHA — CLASSIFICATION
+==============================================================================
+
+DIRECTLY REPROCESSED:
+  • 30-point cooling table
+  • 27-point overdamped-pendulum table
+  • 6,000,000 total statistical resampling checks
+
+IMPORTANT:
+  6,000,000 resampling checks
+  != 6,000,000 independent physical experiments
+
+SUPPORTED:
+  • accessible field/configuration differences
+    are associated with different subsequent changes
+    in these two empirical records
+
+NOT SUPPORTED BY THIS GATE:
+  • universal proof of PHI-INFINITY
+  • unique derivation of standard physical laws
+  • proof that no undiscovered mechanics exists
+  • treating compatibility as quantitative prediction
+
+MOTHER MECHANICS STATUS:
+  NO SECOND FUNDAMENTAL OPERATION REQUIRED
+  WITHIN THESE TWO DIRECT EMPIRICAL FAMILIES
+
+✅ EMPIRICAL REALITY GATE ALPHA PASS

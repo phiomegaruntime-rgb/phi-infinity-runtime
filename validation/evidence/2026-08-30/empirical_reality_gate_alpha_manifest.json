@@ -1,0 +1,16 @@
+{
+  "date": "2026-08-30",
+  "baseline_commit": "3e4e9d65934c179e13c1aafc0a81d12d0422d82e",
+  "gate": "EMPIRICAL_REALITY_GATE_ALPHA",
+  "gate_execution": "PASS",
+  "direct_empirical_tables": 2,
+  "direct_physical_observations": 57,
+  "statistical_resampling_operations": 6000000,
+  "resampling_operations_are_independent_experiments": false,
+  "permanent_pytest_count": 42,
+  "runtime_src_modified": false,
+  "permanent_tests_modified": false,
+  "cooling_sha256": "ed717d68d0bcfc4fd0cff77f3ec226b10ffe76b5997ac42ecbac1bde2aaf0e0c",
+  "pendulum_sha256": "ae70376843f2171539fc08e8dc7fdc7dbd1da1b7c63722a454f75c3e793fde38",
+  "classification": "EMPIRICAL COMPATIBILITY / ADVERSARIAL VALIDATION"
+}

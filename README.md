@@ -450,3 +450,24 @@ Amendment:
 
 The original frozen contract is permanently protected by SHA-256 regression.
 <!-- PHI:MECHANICAL_ADMISSIBILITY:END -->
+
+<!-- PHI:EMPIRICAL_REALITY_ALPHA:START -->
+## Empirical Reality Gate Alpha
+
+PHI-INFINITY now preserves a distinct empirical-reality validation layer.
+
+Alpha directly reprocesses public observational tables from:
+
+- cooling;
+- overdamped pendulum.
+
+External biological and physical-boundary evidence is preserved separately
+as compatibility evidence.
+
+Empirical compatibility is not conflated with permanent runtime tests or
+universal proof.
+
+See:
+
+`docs/validation/EMPIRICAL_REALITY_GATE_ALPHA_2026-08-30.md`
+<!-- PHI:EMPIRICAL_REALITY_ALPHA:END -->
