@@ -365,3 +365,71 @@ PHI must derive this relation rather than insert a desired physical answer.
 \end{aligned}
 }
 \]
+
+<!-- PHI:TEMPORAL_CLOSURE:START -->
+## CURRENT TEMPORAL CLOSURE
+
+The temporal architecture has advanced beyond the earlier formulation in
+which the primary unresolved relation was written as:
+
+\[
+\mathcal C_i \rightarrow \rho_i.
+\]
+
+That formulation is superseded as the fundamental temporal question.
+
+The CURRENT structural ordering is:
+
+\[
+\boxed{
+\mathcal C_{ij}
+\rightarrow
+\Sigma_{ij}
+\rightarrow
+q_{ij}
+}
+\]
+
+with:
+
+\[
+\boxed{
+q_{ij}
+=
+\frac{d\tau_i}{d\tau_j}
+}
+\]
+
+when a scalar temporal ratio is sufficient.
+
+Only when the relational network is integrable may it be represented as:
+
+\[
+\boxed{
+q_{ij}
+=
+\frac{\rho_i}{\rho_j}
+}
+\]
+
+Therefore \(\rho_i\) is a derived representation, not a universal temporal
+primitive.
+
+The structural temporal branch is provisionally closed.
+
+The remaining quantitative physical problem is:
+
+\[
+\boxed{
+\mathcal C_{ij}
+\overset{\mathcal M}{\longrightarrow}
+\Sigma_{ij}
+}
+\]
+
+See:
+
+`docs/TEMPORAL_BRANCH_CLOSURE_CURRENT.md`
+
+for the CURRENT canonical closure.
+<!-- PHI:TEMPORAL_CLOSURE:END -->

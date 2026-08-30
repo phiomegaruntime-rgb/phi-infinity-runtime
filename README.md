@@ -313,3 +313,49 @@ See:
 `docs/PERSONAL_TIME_AND_MECHANICAL_PROGRESS.md`
 
 <!-- PHI-TIME-STRUCTURE-END -->
+
+<!-- PHI:README_TEMPORAL_CLOSURE:START -->
+## Temporal branch — CURRENT structural closure
+
+PHI-INFINITY currently separates numerical progression from temporal
+structure:
+
+\[
+\boxed{
+\lambda_{\mathcal M}\neq\tau
+}
+\]
+
+The primary temporal object is relational:
+
+\[
+\boxed{
+\mathcal C_{ij}
+\rightarrow
+\Sigma_{ij}
+\rightarrow
+q_{ij}
+}
+\]
+
+A scalar representation
+
+\[
+q_{ij}=\rho_i/\rho_j
+\]
+
+is used only when the temporal relation network is integrable.
+
+Therefore \(\rho_i\) is not treated as a universal primitive.
+
+Current status:
+
+- temporal architecture: **provisionally closed**;
+- universal quantitative law
+  \(\mathcal C_{ij}\rightarrow\Sigma_{ij}\): **open**;
+- runtime mechanics: unchanged.
+
+See:
+
+`docs/TEMPORAL_BRANCH_CLOSURE_CURRENT.md`
+<!-- PHI:README_TEMPORAL_CLOSURE:END -->

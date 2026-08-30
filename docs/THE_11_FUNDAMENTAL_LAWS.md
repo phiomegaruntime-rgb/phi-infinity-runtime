@@ -74,3 +74,82 @@ $$\text{BOUNDARY} = \text{INTERFACE FRAGMENT } (M_C)$$
 $$\text{INFINITY} \rightarrow \text{FRAGMENTS} \rightarrow \text{FIELDS} \rightarrow \text{EXCHANGES} \rightarrow \text{TRANSFORMATIONS} \rightarrow \text{CONSEQUENCES} \rightarrow \text{READJUSTMENT} \rightarrow \text{PERSISTENCE/REORGANIZATION}$$
 
 *These 11 laws constitute the essential foundation. Every subsequent development — mathematical formulas, runtime, translations, applications and falsification tests — must be compatible with them.*
+
+<!-- PHI:LAW7_CURRENT_CLOSURE:START -->
+## CURRENT NORMATIVE CLOSURE OF LAW 7 — LOCAL TEMPORAL STRUCTURE
+
+This block is CURRENT and supersedes any earlier temporal wording in this
+document where the two conflict.
+
+A fragment does not require an external universal clock in order to
+continue.
+
+Its temporal structure emerges from the continuity of its mechanics and
+from its relations with other continuations.
+
+The primary relational form is:
+
+\[
+\boxed{
+\mathcal C_{ij}
+\rightarrow
+\Sigma_{ij}
+\rightarrow
+q_{ij}
+}
+\]
+
+where:
+
+\[
+q_{ij}
+=
+\frac{d\tau_i}{d\tau_j}
+\]
+
+when a scalar relation is sufficient.
+
+A scalar representation:
+
+\[
+q_{ij}
+=
+\frac{\rho_i}{\rho_j}
+\]
+
+is permitted only when the relational temporal network is integrable.
+
+Therefore:
+
+\[
+\boxed{
+\rho_i\text{ is derived, not fundamental}
+}
+\]
+
+and:
+
+\[
+\boxed{
+\lambda_{\mathcal M}\neq\tau
+}
+\]
+
+No global synchronization is required.
+
+The invariant requirement is mechanical coherence of real interactions.
+
+The complete quantitative derivation:
+
+\[
+\mathcal C_{ij}
+\overset{\mathcal M}{\longrightarrow}
+\Sigma_{ij}
+\]
+
+remains open.
+
+Canonical closure:
+
+`docs/TEMPORAL_BRANCH_CLOSURE_CURRENT.md`
+<!-- PHI:LAW7_CURRENT_CLOSURE:END -->
