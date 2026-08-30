@@ -153,3 +153,30 @@ Canonical closure:
 
 `docs/TEMPORAL_BRANCH_CLOSURE_CURRENT.md`
 <!-- PHI:LAW7_CURRENT_CLOSURE:END -->
+
+<!-- PHI:UNIVERSAL_MECHANICS:START -->
+## CURRENT UNIVERSAL-MECHANICS FORMALIZATION
+
+The central invariant candidate of PHI-INFINITY is the mother mechanics,
+not an invariant state.
+
+For every real fragment:
+
+\[
+\boxed{
+\mathcal M_F=\mathcal M
+}
+\]
+
+while configurations, states, scales, rhythms and outcomes may differ.
+
+The same mechanics must survive decomposition, composition and changes of
+accessible scale.
+
+A single real fragment requiring a new fundamental causal operation is
+sufficient to falsify universality.
+
+Canonical frozen contract:
+
+`docs/UNIVERSAL_MOTHER_MECHANICS_CURRENT.md`
+<!-- PHI:UNIVERSAL_MECHANICS:END -->

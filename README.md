@@ -359,3 +359,32 @@ See:
 
 `docs/TEMPORAL_BRANCH_CLOSURE_CURRENT.md`
 <!-- PHI:README_TEMPORAL_CLOSURE:END -->
+
+<!-- PHI:README_UNIVERSAL_MECHANICS:START -->
+## Universal Mother Mechanics — CURRENT falsification target
+
+PHI-INFINITY's central universality hypothesis is:
+
+\[
+\boxed{
+\forall F\subset\Omega:
+\mathcal M_F=\mathcal M
+}
+\]
+
+Fragments and configurations need not be identical.
+
+The invariant candidate is the mechanics by which differences,
+dependencies, exchanges, transformations and consequences produce
+continuation.
+
+The hypothesis is now frozen before adversarial testing.
+
+First required gate:
+
+**Recursive Scale Identity**
+
+Canonical contract:
+
+`docs/UNIVERSAL_MOTHER_MECHANICS_CURRENT.md`
+<!-- PHI:README_UNIVERSAL_MECHANICS:END -->
