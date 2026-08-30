@@ -421,3 +421,32 @@ A passing test does not prove universal PHI validity. It establishes only
 that the tested falsification route did not destroy the corresponding
 property.
 <!-- PHI:VALIDATION_LEDGER:END -->
+
+<!-- PHI:MECHANICAL_ADMISSIBILITY:START -->
+## Mother Mechanics Amendment 01 — Mechanical Admissibility
+
+The already-frozen Universal Mother Mechanics remains unchanged.
+
+A derived clarification now records that formation already presupposes
+mechanics, and that recognizable persistence requires dynamic compatibility
+with the same Mother Mechanics.
+
+\[
+\boxed{
+\operatorname{Persist}(X)
+\Rightarrow
+\operatorname{Compatible}_{\mathcal M}
+(X,\mathcal C_X)
+}
+\]
+
+Failure to remain compatible may produce reorganization or loss of the
+current fragment continuity; it does not constitute an exception to the
+Mother Mechanics.
+
+Amendment:
+
+`docs/UNIVERSAL_MOTHER_MECHANICS_AMENDMENT_01_MECHANICAL_ADMISSIBILITY.md`
+
+The original frozen contract is permanently protected by SHA-256 regression.
+<!-- PHI:MECHANICAL_ADMISSIBILITY:END -->

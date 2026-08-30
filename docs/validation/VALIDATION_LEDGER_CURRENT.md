@@ -238,3 +238,57 @@ A passed gate means:
 
 That result becomes part of the permanent genealogy of the project whenever
 it freezes an invariant.
+
+<!-- PHI:MECHANICAL_ADMISSIBILITY_AMENDMENT:START -->
+## Mechanical Admissibility Amendment 01
+
+The original frozen Mother Mechanics remains byte-identical.
+
+A derived clarification is recorded separately at:
+
+`docs/UNIVERSAL_MOTHER_MECHANICS_AMENDMENT_01_MECHANICAL_ADMISSIBILITY.md`
+
+The clarification states:
+
+\[
+\boxed{
+\text{FORMATION}
+\Rightarrow
+\mathcal M\text{ already operating}
+}
+\]
+
+and:
+
+\[
+\boxed{
+\operatorname{Persist}(X)
+\Rightarrow
+\operatorname{Compatible}_{\mathcal M}
+(X,\mathcal C_X)
+}
+\]
+
+Incompatibility with recognizable persistence is not a violation of the
+Mother Mechanics; it may produce transformation, reorganization,
+incorporation, fragmentation or loss of the current continuity.
+
+The amendment adds no new fundamental causal operation.
+
+Two permanent semantic gates were added:
+
+`tests/test_mother_mechanics_contract.py`
+
+They protect:
+
+1. byte identity of the original frozen Mother Mechanics contract;
+2. the explicit Mechanical Admissibility formulation.
+
+The cumulative permanent suite is therefore now:
+
+\[
+\boxed{
+42\ \text{pytest cases}
+}
+\]
+<!-- PHI:MECHANICAL_ADMISSIBILITY_AMENDMENT:END -->

@@ -1,0 +1,39 @@
+PHI-INFINITY — MECHANICAL ADMISSIBILITY AMENDMENT 01
+
+Date:
+2026-08-30
+
+Baseline commit:
+2a16883a9372424e74ef4da802d6748664aab8aa
+
+Frozen Mother Mechanics document:
+docs/UNIVERSAL_MOTHER_MECHANICS_CURRENT.md
+
+Frozen Mother Mechanics SHA256 before amendment:
+0cea8129245b212c04fa776bdc1b718fabf50998a9635e1e06716504fc410f7b
+
+Frozen Mother Mechanics SHA256 after amendment:
+0cea8129245b212c04fa776bdc1b718fabf50998a9635e1e06716504fc410f7b
+
+Byte-identical:
+YES
+
+Runtime src modified:
+NO
+
+Permanent tests before:
+40
+
+Permanent tests after:
+42
+
+New permanent tests:
+- frozen Mother Mechanics SHA256 protection
+- Mechanical Admissibility semantic protection
+
+Amendment document:
+docs/UNIVERSAL_MOTHER_MECHANICS_AMENDMENT_01_MECHANICAL_ADMISSIBILITY.md
+
+Scientific status:
+DERIVED CLARIFICATION OF FROZEN MECHANICS
+NOT A NEW FUNDAMENTAL CAUSAL OPERATION
