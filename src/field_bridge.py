@@ -865,10 +865,10 @@ class FieldBridge:
                             ]
                         ),
 
-                    "d_tau":
+                    "structural_path_increment":
                         float(
                             metrics[
-                                "mean_dtau"
+                                "mean_structural_path_increment"
                             ]
                         ),
 
@@ -1616,7 +1616,7 @@ class FieldBridge:
             float(
                 min(
                     step[
-                        "d_tau"
+                        "structural_path_increment"
                     ]
                     for step
                     in final_steps
@@ -1626,7 +1626,7 @@ class FieldBridge:
             float(
                 max(
                     step[
-                        "d_tau"
+                        "structural_path_increment"
                     ]
                     for step
                     in final_steps

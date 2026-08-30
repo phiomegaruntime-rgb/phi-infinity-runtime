@@ -48,7 +48,7 @@ def assert_same_phi_trajectory(result_a, result_b):
     for step_a, step_b in zip(result_a["trajectory"], result_b["trajectory"]):
         assert step_a["M_C"] == step_b["M_C"]
         assert step_a["R_C"] == step_b["R_C"]
-        assert step_a["d_tau"] == step_b["d_tau"]
+        assert step_a["structural_path_increment"] == step_b["structural_path_increment"]
         assert np.array_equal(step_a["S"], step_b["S"])
         assert np.array_equal(step_a["R"], step_b["R"])
         assert np.array_equal(step_a["W"], step_b["W"])
@@ -93,7 +93,7 @@ def test_field_dependence_without_preconceptions():
             np.array_equal(step_a["W"], step_b["W"]) and
             step_a["M_C"] == step_b["M_C"] and
             step_a["R_C"] == step_b["R_C"] and
-            step_a["d_tau"] == step_b["d_tau"]
+            step_a["structural_path_increment"] == step_b["structural_path_increment"]
         )
         if not same_step:
             same_trajectory = False

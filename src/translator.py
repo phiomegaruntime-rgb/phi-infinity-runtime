@@ -17,7 +17,7 @@ class PhiBidirectionalTranslator:
         initial_R = 1.2 if is_rigid_statement else 0.01
         incomp = abs((energy_bias / (resource_bias + 1e-3)) - 1.0)
         initial_R += 0.5 * (incomp ** 2)
-        
+
         return {
             "entity": entity_name,
             "mapped_to": "Cluster di Nodi C",
@@ -26,7 +26,7 @@ class PhiBidirectionalTranslator:
             "hypothesis": "M_C(tau) > 1.0 da verificare per evoluzione dinamica"
         }
 
-    def translate_phi_to_human(self, M_C, R_C, d_tau, K_ext, K_int, name="X"):
+    def translate_phi_to_human(self, M_C, R_C, structural_path_increment, K_ext, K_int, name="X"):
         """
         Direzione 1: T_Phi_H (Dal Substrato Relazionale al Linguaggio Umano)
         Converte grandezze topologiche in sintassi umana trasparente senza forzature probabilistiche.
@@ -48,6 +48,6 @@ class PhiBidirectionalTranslator:
             apertura = f"Interfaccia attiva permeabile (K_ext = {K_ext:.2f}, K_int = {K_int:.2f})."
 
         # 3. Tempo proprio locale
-        dinamica = f"Tasso di mutamento proprio locale d_tau = {d_tau:.4f}."
-        
+        dinamica = f"Incremento strutturale rappresentato locale structural_path_increment = {structural_path_increment:.4f}."
+
         return f"{stato} | {apertura} | {dinamica}"

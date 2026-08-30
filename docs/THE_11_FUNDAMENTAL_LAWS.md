@@ -1,6 +1,6 @@
 # PHI-INFINITY: THE 11 FUNDAMENTAL LAWS
-**Essential Formulation of Fragment Mechanics**  
-*Edition: v1.0 — 28/08/2026*  
+**Essential Formulation of Fragment Mechanics**
+*Edition: v1.0 — 28/08/2026*
 *Author: Massimiliano Brighindi*
 
 The foundation is expressed through the smallest possible number of rules. Names, theories, formulas and applications come afterward: these laws describe the fundamental mechanics from which everything else must be derived.
@@ -31,9 +31,26 @@ $$\text{EQUILIBRIUM} = \text{DYNAMIC COMPATIBILITY OF EXCHANGES}$$
 Fragments can be similar, but two truly distinct fragments can never be absolutely identical. Two distinct fragments must possess at least one real difference: in configuration, relational position, exchanges, genealogy, traces or consequences. If no difference existed at any depth, the existence of two distinct fragments would not have been demonstrated.
 $$A \neq B \rightarrow \text{AT LEAST ONE REAL DIFFERENCE EXISTS}$$
 
-### 7. Law of proper time
-Every fragment possesses its own proper time, which varies with its nature and with its position in the field. Time is not assumed as a universal container. It is the measurable rhythm of the fragment's transformation, dependent on its configuration, internal transformations, exchanges and relations within the field.
-$$\text{TRANSFORMATION} \rightarrow \text{PROPER RHYTHM} \rightarrow \text{MEASURABLE TIME } (d\tau)$$
+### 7. Law of Local Temporal Structure
+
+Reality is treated as uninterrupted transformation rather than as a sequence
+of ontologically static states.
+
+The mechanics is one, while fragments may exhibit different local temporal
+rhythms according to their configurations and fields.
+
+No privileged universal clock is assumed.
+
+`mechanical_progress` is only a neutral coordinate for numerical traversal of
+the mechanical trajectory.
+
+A represented structural increment is not proper time.
+
+Apparent immobility states only that transformation is not distinguishable at
+the current access, scale and resolution.
+
+Proper-time relations must emerge from the mechanics when they become
+derivable.
 
 ### 8. Law of universality of the mechanics
 No fragments exist in infinite reality that lie outside these rules and mechanics. Whatever human name is assigned to a configuration, the underlying mechanics remain those of fragments, fields, exchanges, transformations, dependencies, and persistence or reorganization.

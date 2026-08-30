@@ -14,7 +14,7 @@ def run_demo():
         memb = evaluator.evaluate_cluster(engine, cluster)
         history["energy"].append(m["mean_energy"])
         history["stress"].append(m["mean_stress"])
-        history["dtau"].append(m["mean_dtau"])
+        history["dtau"].append(m["mean_structural_path_increment"])
         history["m_c"].append(memb["M_C"])
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
     ax = axes[0, 0]

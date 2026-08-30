@@ -331,7 +331,7 @@ def combine_boundary_receipts(
 # LOCAL TRANSFORMATION WITH CONTAINING-FIELD EFFECTS
 # ============================================================
 
-def step_with_boundary(
+def _step_with_boundary_phi_mechanics(
     engine,
     receipt,
 ):
@@ -474,7 +474,7 @@ def step_with_boundary(
     )
 
 
-    d_tau = np.linalg.norm(
+    structural_path_increment = np.linalg.norm(
         engine.S
         -
         prev_S,
@@ -501,7 +501,7 @@ def step_with_boundary(
             1.0
             -
             engine.lmbda
-            * d_tau
+            * structural_path_increment
         )
         * engine.R
         +
@@ -509,7 +509,7 @@ def step_with_boundary(
         * (
             incomp ** 2
         )
-        * d_tau
+        * structural_path_increment
     )
 
 
@@ -570,13 +570,233 @@ def step_with_boundary(
                 )
             ),
 
-        "mean_dtau":
+        "mean_structural_path_increment":
             float(
                 np.mean(
-                    d_tau
+                    structural_path_increment
                 )
             ),
     }
+
+def step_with_boundary(
+    engine,
+    *args,
+    mechanical_progress=1.0,
+    **kwargs,
+):
+    """
+    Traverse the existing boundary-aware PHI mechanics using
+    a neutral mechanical-progress coordinate.
+
+    The original boundary function is preserved as
+    _step_with_boundary_phi_mechanics().
+
+    mechanical_progress is NOT proper time.
+    """
+
+    try:
+        progress = float(
+            mechanical_progress
+        )
+
+    except (
+        TypeError,
+        ValueError,
+    ) as exc:
+
+        raise ValueError(
+            "mechanical_progress must be a finite "
+            "strictly positive scalar."
+        ) from exc
+
+
+    if (
+        not np.isfinite(
+            progress
+        )
+        or
+        progress <= 0.0
+    ):
+
+        raise ValueError(
+            "mechanical_progress must be finite "
+            "and strictly positive."
+        )
+
+
+    prev_pos = engine.pos.copy()
+    prev_S = engine.S.copy()
+    prev_R = engine.R.copy()
+
+
+    original_mu = engine.mu
+    original_eta = engine.eta
+
+
+    try:
+
+        engine.mu = (
+            original_mu
+            *
+            progress
+        )
+
+        engine.eta = (
+            original_eta
+            *
+            progress
+        )
+
+
+        result = (
+            _step_with_boundary_phi_mechanics(
+                engine,
+                *args,
+                **kwargs,
+            )
+        )
+
+
+    finally:
+
+        engine.mu = original_mu
+        engine.eta = original_eta
+
+
+    if result is None:
+
+        result = {}
+
+
+    elif isinstance(
+        result,
+        dict,
+    ):
+
+        result = dict(
+            result
+        )
+
+
+    else:
+
+        raise TypeError(
+            "_step_with_boundary_phi_mechanics() "
+            "must return dict or None."
+        )
+
+
+    structural_path_increment = (
+        np.linalg.norm(
+            engine.S
+            -
+            prev_S,
+            axis=1,
+        )
+    )
+
+
+    geometry_path_increment = (
+        np.linalg.norm(
+            engine.pos
+            -
+            prev_pos,
+            axis=1,
+        )
+    )
+
+
+    residual_path_increment = (
+        np.abs(
+            engine.R
+            -
+            prev_R
+        )
+    )
+
+
+    represented_transformation = bool(
+        np.any(
+            structural_path_increment
+            !=
+            0.0
+        )
+        or
+        np.any(
+            geometry_path_increment
+            !=
+            0.0
+        )
+        or
+        np.any(
+            residual_path_increment
+            !=
+            0.0
+        )
+    )
+
+
+    result[
+        "mechanical_progress"
+    ] = progress
+
+
+    result[
+        "structural_path_increment"
+    ] = (
+        structural_path_increment.copy()
+    )
+
+
+    result[
+        "mean_structural_path_increment"
+    ] = float(
+        np.mean(
+            structural_path_increment
+        )
+    )
+
+
+    result[
+        "geometry_path_increment"
+    ] = (
+        geometry_path_increment.copy()
+    )
+
+
+    result[
+        "residual_path_increment"
+    ] = (
+        residual_path_increment.copy()
+    )
+
+
+    result[
+        "representation_status"
+    ] = (
+        "REPRESENTED_TRANSFORMATION"
+        if represented_transformation
+        else
+        (
+            "NO_DISTINGUISHABLE_TRANSFORMATION_"
+            "IN_CURRENT_REPRESENTATION"
+        )
+    )
+
+
+    result.pop(
+        "d_tau",
+        None,
+    )
+
+    result.pop(
+        "mean_dtau",
+        None,
+    )
+
+
+    return result
+
 
 
 # ============================================================

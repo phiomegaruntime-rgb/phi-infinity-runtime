@@ -5,9 +5,9 @@
 
 Deterministic bottom-up relational computing framework for multi-agent governance, invariant substrates, emergent boundary persistence, and anti-hallucination semantic bridging.
 
-**Author:** Massimiliano Brighindi  
-**Edition:** Integral Blueprint 2026 (v1.2.0)  
-**Version DOI:** [10.5281/zenodo.22150329](https://doi.org/10.5281/zenodo.22150329)  
+**Author:** Massimiliano Brighindi
+**Edition:** Integral Blueprint 2026 (v1.2.0)
+**Version DOI:** [10.5281/zenodo.22150329](https://doi.org/10.5281/zenodo.22150329)
 **Concept DOI:** [10.5281/zenodo.22143113](https://doi.org/10.5281/zenodo.22143113)
 
 ---
@@ -22,7 +22,7 @@ The runtime, equations, and translation protocols are rigorous computational imp
 4. **Fragment-Field Law:** Duality of scale; every field is a fragment and vice versa.
 5. **Law of Proper Equilibrium:** Homeostasis as dynamic compatibility of flows.
 6. **Law of Non-Identity:** Distinct entities have at least one real differential trace.
-7. **Law of Proper Time ($d\tau$):** Time is the local rate of structural transformation.
+7. **Law of Local Temporal Structure ($d\tau$):** Time is the local rate of structural transformation.
 8. **Law of Universality:** Invariant mechanics underlying all physical/semiotic phenomena.
 9. **Law of Consequences:** Every real difference generates propagating transformations.
 10. **Law of Transformation:** Strict conservation; state redistribution without magic deletion.
@@ -34,7 +34,7 @@ The runtime, equations, and translation protocols are rigorous computational imp
 
 ## Core Architecture (`src/`)
 
-* **`core.py`:** 6 primitive invariant equations, antisymmetric tanh flows, local proper time ($d\tau$), and stress-induced force inversion $(1 - \beta R_i)$.
+* **`core.py`:** 6 primitive invariant equations, antisymmetric tanh flows, local represented structural path increment, and stress-induced force inversion $(1 - \beta R_i)$.
 * **`membrane.py`:** Emergent boundary persistence metric ($M_C$) evaluating topological cohesion.
 * **`gating.py`:** Ex-ante deterministic gating (`FirstDivergence` and `REOPEN`).
 * **`translator.py`:** Universal Bidirectional Translation Protocol ($T_{H \to \Phi}$ deconstruction & $T_{\Phi \to H}$ anti-hallucination semantic bridging).
@@ -259,3 +259,57 @@ The native PHI mechanics remain unchanged.
 
 <!-- PHI-RELEVANCE-END -->
 
+<!-- PHI-TIME-STRUCTURE-BEGIN -->
+
+## Flow, Mechanical Progress, and Personal Time
+
+PHI-INFINITY now separates the mechanical trajectory from the numerical
+coordinate used to traverse it.
+
+The runtime uses
+
+\[
+d\lambda_{\mathcal M}
+\]
+
+as a neutral `mechanical_progress` coordinate.
+
+It is not universal time and it is not proper time.
+
+The previous quantity
+
+\[
+\|\Delta S\|
+\]
+
+is now treated only as a represented structural path increment.
+
+Structural, geometric and residual transformations are exposed separately.
+
+A zero represented transformation is never promoted to the ontological claim
+that reality is static.
+
+Coherent reparameterization must preserve the represented trajectory.
+
+Personal-time relations remain emergent:
+
+\[
+d\tau_i
+=
+\rho_i\,d\lambda_{\mathcal M},
+\qquad
+q_{ij}
+=
+\frac{\rho_i}{\rho_j},
+\]
+
+but no universal formula for \(\rho_i\) has yet been introduced.
+
+The temporal model therefore requires coherence between local flows rather
+than global synchronization.
+
+See:
+
+`docs/PERSONAL_TIME_AND_MECHANICAL_PROGRESS.md`
+
+<!-- PHI-TIME-STRUCTURE-END -->
