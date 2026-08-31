@@ -451,6 +451,84 @@ Amendment:
 The original frozen contract is permanently protected by SHA-256 regression.
 <!-- PHI:MECHANICAL_ADMISSIBILITY:END -->
 
+<!-- PHI:ACCESSIBLE_DERIVABILITY:START -->
+## Accessible Derivability and Scale Reopening
+
+PHI-INFINITY now records the derived Wall 25:
+
+\[
+\boxed{
+I\in\Omega_A
+\land
+\operatorname{Discriminable}(I)
+\Rightarrow
+\operatorname{PotentiallyCalculable}_{\mathcal M}(I)
+}
+\]
+
+Every real information that is accessible and mechanically discriminable
+is, in principle, potentially calculable or reconstructible through the
+same Mother Mechanics.
+
+Apparent non-derivability at the current represented scale does not
+immediately license a new domain-specific theory or mechanics.
+
+The mandatory first response is:
+
+\[
+\boxed{
+\operatorname{REOPEN}
+(
+\text{scale},
+\text{field},
+\text{boundary},
+\text{genealogy},
+\text{access}
+)
+}
+\]
+
+Therefore:
+
+\[
+\text{not derivable at current scale}
+\neq
+\text{not derivable through }\mathcal M
+\]
+
+and:
+
+\[
+\text{not distinguishable at current scale}
+\neq
+\text{not real}.
+\]
+
+Bell-type correlation is preserved as the motivating adversarial
+reconstruction:
+
+\[
+\text{spatial distinguishability}
+\neq
+\text{mechanical factorization}.
+\]
+
+No Bell-specific signal primitive or second mechanics is introduced.
+
+The wall does not authorize guessing inaccessible information.
+Non-discriminating access remains `UNRESOLVED`.
+
+The frozen Mother Mechanics remains unchanged.
+
+See:
+
+`docs/UNIVERSAL_MOTHER_MECHANICS_AMENDMENT_02_ACCESSIBLE_DERIVABILITY_AND_SCALE_REOPENING.md`
+
+and:
+
+`docs/validation/ACCESSIBLE_DERIVABILITY_SCALE_REOPENING_WALL_2026-08-31.md`
+<!-- PHI:ACCESSIBLE_DERIVABILITY:END -->
+
 <!-- PHI:EMPIRICAL_REALITY_ALPHA:START -->
 ## Empirical Reality Gate Alpha
 

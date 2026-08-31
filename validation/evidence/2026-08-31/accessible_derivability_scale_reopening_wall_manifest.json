@@ -1,0 +1,33 @@
+{
+  "project": "PHI-INFINITY",
+  "record": "Accessible Derivability / Scale Reopening Wall",
+  "wall": 25,
+  "amendment": 2,
+  "date": "2026-08-31",
+  "classification": "DERIVED_OPERATIONAL_WALL_SEMANTIC_ANTIDRIFT",
+  "baseline_commit": "151a4dd1c7bb3fd22012f99bb7106f4fc22f1ff6",
+  "frozen_mother_mechanics_sha256": "0cea8129245b212c04fa776bdc1b718fabf50998a9635e1e06716504fc410f7b",
+  "expected_frozen_sha256": "0cea8129245b212c04fa776bdc1b718fabf50998a9635e1e06716504fc410f7b",
+  "frozen_mother_byte_identical": true,
+  "src_tracked_sha256_before": "42f1e78a1d3b0b004b0244571a871e52f08ad26b62f22fb1cd3845d79d9ebc97",
+  "src_tracked_sha256_after": "42f1e78a1d3b0b004b0244571a871e52f08ad26b62f22fb1cd3845d79d9ebc97",
+  "src_tracked_byte_identical": true,
+  "preexisting_tests_byte_identical": true,
+  "pytest_before": 42,
+  "pytest_after": 46,
+  "new_semantic_tests_first_install": 4,
+  "main_py_pass": true,
+  "new_fundamental_mechanics_added": false,
+  "mother_mechanics_modified": false,
+  "bell_role": "motivating_adversarial_scale_reopening_reconstruction",
+  "bell_quantitative_chsh_claimed": false,
+  "principle": "accessible_and_mechanically_discriminable_real_information_is_potentially_calculable_through_M",
+  "reopen_before_new_mechanics": [
+    "scale",
+    "field",
+    "boundary",
+    "genealogy",
+    "access"
+  ],
+  "generated_utc": "2026-08-31T14:21:46.215908+00:00"
+}

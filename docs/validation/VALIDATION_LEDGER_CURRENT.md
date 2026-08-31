@@ -348,3 +348,84 @@ Current licensed conclusion:
 
 Universal proof is not claimed.
 <!-- PHI:EMPIRICAL_REALITY_ALPHA:END -->
+
+<!-- PHI:AMENDMENT_02_ACCESSIBLE_DERIVABILITY:START -->
+## Accessible Derivability / Scale Reopening — Amendment 02
+
+**Date:** 31 August 2026
+
+**Classification:**
+
+`DERIVED OPERATIONAL WALL / SEMANTIC ANTI-DRIFT`
+
+The original frozen Mother Mechanics remains byte-identical.
+
+Derived clarification:
+
+`docs/UNIVERSAL_MOTHER_MECHANICS_AMENDMENT_02_ACCESSIBLE_DERIVABILITY_AND_SCALE_REOPENING.md`
+
+Validation record:
+
+`docs/validation/ACCESSIBLE_DERIVABILITY_SCALE_REOPENING_WALL_2026-08-31.md`
+
+The new cumulative wall is:
+
+\[
+\boxed{
+I\in\Omega_A
+\land
+\operatorname{Discriminable}(I)
+\Rightarrow
+\operatorname{PotentiallyCalculable}_{\mathcal M}(I)
+}
+\]
+
+The mandatory response to apparent non-derivability at the represented
+scale is:
+
+\[
+\boxed{
+\operatorname{REOPEN}
+(
+\text{scale},
+\text{field},
+\text{boundary},
+\text{genealogy},
+\text{access}
+)
+}
+\]
+
+before importing any new fundamental mechanics.
+
+Permanent protections:
+
+- `not derivable at current scale != not derivable through M`;
+- `not distinguishable at current scale != not real`;
+- `M != signal`;
+- Bell spatial distinguishability does not automatically imply mechanical
+  factorization;
+- `UNRESOLVED` remains mandatory under non-discriminating access;
+- sufficient-access FirstDivergence remains a valid falsification route.
+
+This amendment introduces no new fundamental causal operation.
+
+Four permanent semantic tests are added at:
+
+`tests/test_accessible_derivability_scale_reopening.py`
+
+On the 31 August 2026 CURRENT baseline this raises the permanent suite from:
+
+`42`
+
+to:
+
+`46`
+
+pytest cases.
+
+Historical 40-test and 42-test records remain preserved as historical
+milestones and are not rewritten.
+
+Exact quantitative Bell/CHSH generation is not claimed by this amendment.
+<!-- PHI:AMENDMENT_02_ACCESSIBLE_DERIVABILITY:END -->

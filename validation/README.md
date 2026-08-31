@@ -67,3 +67,29 @@ original raw instrument files.
 A passing empirical gate establishes empirical compatibility for the tested
 families, not universal proof.
 <!-- PHI:EMPIRICAL_GATES:END -->
+
+<!-- PHI:ACCESSIBLE_DERIVABILITY_VALIDATION:START -->
+## Accessible Derivability / Scale Reopening
+
+Permanent semantic protection:
+
+`../tests/test_accessible_derivability_scale_reopening.py`
+
+Derived Amendment 02:
+
+`../docs/UNIVERSAL_MOTHER_MECHANICS_AMENDMENT_02_ACCESSIBLE_DERIVABILITY_AND_SCALE_REOPENING.md`
+
+Validation record:
+
+`../docs/validation/ACCESSIBLE_DERIVABILITY_SCALE_REOPENING_WALL_2026-08-31.md`
+
+Core wall:
+
+`accessible + mechanically discriminable -> potentially calculable through M`
+
+Operational rule:
+
+`apparent non-derivability -> reopen scale / field / boundary / genealogy / access first`
+
+No second mechanics is introduced.
+<!-- PHI:ACCESSIBLE_DERIVABILITY_VALIDATION:END -->

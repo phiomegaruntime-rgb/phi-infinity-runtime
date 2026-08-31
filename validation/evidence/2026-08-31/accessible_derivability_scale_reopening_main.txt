@@ -1,0 +1,3 @@
+=== PHI-INFINITY ACCESSPOINTER DEMO ===
+REGION [0, 1]: status=PERSISTENT; M_C compatible range=[4.469280, 4.962501]; R_C range=[0.000097, 0.006211]; 8 candidate genealogies collapse to one continuation class under current access.
+Resolution scope: ONE_CONTINUATION_CLASS_WITHIN_EXPLORED_SEARCH_DOMAIN

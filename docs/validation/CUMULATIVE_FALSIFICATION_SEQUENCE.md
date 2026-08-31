@@ -83,6 +83,26 @@ earlier surviving constraints.
     - deliberately treating the missing exterior as zero produces a
       distinguishably different continuation.
 
+<!-- PHI:WALL_25_ACCESSIBLE_DERIVABILITY:START -->
+25. **Accessible derivability / scale reopening**
+    - every real information that is accessible and mechanically
+      discriminable is potentially calculable or reconstructible through
+      the same Mother Mechanics;
+    - apparent non-derivability at the current represented scale requires
+      reopening scale, field, boundary, genealogy and access before any new
+      mechanics is licensed;
+    - not distinguishable at scale \(s\) is not equivalent to not real;
+    - not derivable at scale \(s\) is not equivalent to not derivable
+      through \(\mathcal M\);
+    - Bell-type spatial distinction must not be promoted automatically to
+      mechanical factorization or to a superluminal-signal primitive;
+    - \(\mathcal M\) is not a travelling signal between fragments;
+    - inaccessible or non-discriminating access remains `UNRESOLVED`;
+    - scale reopening does not immunize PHI from falsification:
+      a genuinely new fundamental causal operation under sufficient
+      relevant access remains a valid `FirstDivergence`.
+<!-- PHI:WALL_25_ACCESSIBLE_DERIVABILITY:END -->
+
 The next primary target is not another convenient synthetic example.
 
 It is:

@@ -1,0 +1,12 @@
+PHI-INFINITY AMENDMENT 02
+ACCESSIBLE DERIVABILITY / SCALE REOPENING
+
+================ PRE-AMENDMENT ================
+
+..........................................                               [100%]
+42 passed in 10.10s
+
+================ POST-AMENDMENT ===============
+
+..............................................                           [100%]
+46 passed in 8.30s
