@@ -1,6 +1,32 @@
 # PHI-INFINITY — VALIDATION LEDGER — CURRENT
 
-**Consolidated:** 2026-08-30
+**Updated index:** 2026-09-27. The detailed baseline below was consolidated
+on 2026-08-30 and is preserved as a historical snapshot.
+
+## Current repository status (2026-09-27)
+
+- `pytest -q`: **46 passed**, collected from 10 test modules at commit
+  `05457edf930f1d9ff833472a8baef3124fa822f7` before this documentation
+  update. This supersedes the historical count of 40 below, without editing
+  that earlier result.
+- `python validation/run_all_validation_gates.py`: permanent suite, RHO
+  emergence gate and demo completed successfully at the same baseline.
+- Frozen Mother Mechanics SHA-256:
+  `0cea8129245b212c04fa776bdc1b718fabf50998a9635e1e06716504fc410f7b`.
+- The later conceptual and numerical work is indexed in
+  [`../M_OMNIA_STATO_RICERCA_2026-09-27.md`](../M_OMNIA_STATO_RICERCA_2026-09-27.md).
+- The 25 September fixed-seed comparison has a
+  [result summary](ADVERSARIAL_STRESS_TEST_2026-09-25.md); neither the raw
+  artifacts nor its generator are in this repository. No `M_gate` stop
+  occurred in the 100 steps inspected from the author's files.
+
+**Evidence boundary:** the 46 tests protect the August implementation. The
+subsequent manuscripts and the 25 September simulator have separate evidence
+classes. No later proposal is silently promoted into the frozen engine.
+
+---
+
+## Historical consolidation (2026-08-30)
 
 **Baseline repository commit:**
 
