@@ -9,6 +9,17 @@ separatamente per questa revisione. **I file grezzi e il programma originale
 `simulation.py` non sono pubblicati in questo repository**; i conteggi non
 sono pertanto riproducibili da questo checkout.
 
+Un [audit eseguibile](../../validation/gates/stress_test_artifact_audit.py)
+permette di verificare hash, coerenza CSV/log e conteggi quando si disponga
+dei tre file originali. Esecuzione, dalla radice del repository:
+
+```bash
+python validation/gates/stress_test_artifact_audit.py /percorso/agli/output_originali
+```
+
+L'audit non rigenera i dati: il codice generatore non è stato consegnato con
+gli output e non va ricostruito a posteriori come se fosse l'originale.
+
 ## Risultati letti dal CSV, senza ricalibrazione
 
 | Misura | Risultato |
