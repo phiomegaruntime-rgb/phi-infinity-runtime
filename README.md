@@ -1,20 +1,34 @@
 # PHI-INFINITY (Phi-Infinity) Computational Runtime
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22150329.svg)](https://doi.org/10.5281/zenodo.22150329)
-[![GitHub License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 Deterministic bottom-up relational computing framework for multi-agent governance, invariant substrates, emergent boundary persistence, and anti-hallucination semantic bridging.
 
 **Author:** Massimiliano Brighindi
-**Edition:** Integral Blueprint 2026 (v1.2.0)
+**Runtime edition:** Integral Blueprint 2026 (v1.2.0; August baseline)
 **Version DOI:** [10.5281/zenodo.22150329](https://doi.org/10.5281/zenodo.22150329)
 **Concept DOI:** [10.5281/zenodo.22143113](https://doi.org/10.5281/zenodo.22143113)
+
+**Research status (27 September 2026):** The later M-OMNIA work is mapped in
+[`docs/M_OMNIA_STATO_RICERCA_2026-09-27.md`](docs/M_OMNIA_STATO_RICERCA_2026-09-27.md)
+(Italian). It records the conceptual sequence `A: solution -> B: derivation path
+-> C: formalization`, the status of the newer time and phase-transition
+proposals, and what is still absent from this frozen runtime. The
+[25 September stress-test summary](docs/validation/ADVERSARIAL_STRESS_TEST_2026-09-25.md)
+show 20 commits, 80 rejections, and **no** `M_gate` stop in 100 cycles. This
+simulation is separate from the `src/` engine and does not establish physical
+universality. The raw files and simulation code are not published here. The
+permanent regression suite currently collects **46 cases**.
+
+The older sections below describe the versioned August runtime and its
+historical freeze; their `CURRENT` labels are not a claim that later research
+has been reverted.
 
 ---
 
 ## Axiomatic Foundation: The 11 Fundamental Laws
 
-The runtime, equations, and translation protocols are rigorous computational implementations of the **11 Fundamental Laws of Fragment Mechanics** (v1.0 — 28/08/2026):
+The August runtime encodes a research specification called the **11 Fundamental Laws of Fragment Mechanics** (v1.0 — 28/08/2026):
 
 1. **Law of INFINITY:** Reality consists of infinite continuous fragments.
 2. **Law of Recursive Fragmentation:** No terminal scale or irreducible static particle.
@@ -45,7 +59,7 @@ The runtime, equations, and translation protocols are rigorous computational imp
 ## Quick Start & Execution
 
 ```bash
-git clone [https://github.com/](https://github.com/)phiomegaruntime-rgb/phi-infinity-runtime.git
+git clone https://github.com/phiomegaruntime-rgb/phi-infinity-runtime.git
 cd phi-infinity-runtime
 python main.py
 python demo.py
@@ -63,7 +77,7 @@ python demo.py
   version      = {1.2.0},
   publisher    = {Zenodo},
   doi          = {10.5281/zenodo.22150329},
-  url          = {[https://doi.org/](https://doi.org/)10.5281/zenodo.22150329}
+  url          = {https://doi.org/10.5281/zenodo.22150329}
 }
 ```
 
