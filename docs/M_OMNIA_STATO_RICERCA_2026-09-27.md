@@ -79,7 +79,7 @@ costanti del codice congelato.
 | Fase | Documento/risultato | Rapporto con la fase corrente |
 | --- | --- | --- |
 | 30–31 agosto | Contratto congelato, due amendment e 46 casi oggi raccolti | Baseline storica protetta; non va riscritta. |
-| Settembre, manoscritti M-OMNIA | Formalismo, Reality Gates, ricostruzione del fotone e trattato consegnati dall'autore | Sviluppi della ricerca, con affermazioni da tenere distinte dalle verifiche riprodotte nel repository. I PDF non sono pubblicati in questo aggiornamento. |
+| Agosto–settembre, manoscritti M-OMNIA | Trattato (PDF creato il 26 agosto), Reality Gates, formalismo e ricostruzione del fotone consegnati dall'autore | Sviluppi della ricerca, con affermazioni da tenere distinte dalle verifiche riprodotte nel repository. I PDF non sono pubblicati in questo aggiornamento. |
 | 20 settembre | Manoscritto sul tempo geometrico | Sviluppo successivo del ramo temporale; non si legge il documento di agosto come veto a priori. Il PDF non è incluso qui. |
 | 25 settembre | Manoscritto sull'invarianza runtime e [sintesi del confronto](validation/ADVERSARIAL_STRESS_TEST_2026-09-25.md) | Risultato nel simulatore definito; non dimostrazione fisica generale. I file originali non sono pubblicati qui. |
 | 27 settembre | Protocollo di inizializzazione fornito dall'autore | Stato concettuale corrente; l'implementazione nuova richiede derivazione e prova separate. |
@@ -88,6 +88,11 @@ I file più recenti sviluppano e possono correggere i precedenti. I documenti
 di agosto etichettati `CURRENT` appartengono allo stato allora congelato del
 repository. Una differenza tra loro e un manoscritto di settembre non è, da
 sola, una contraddizione all'interno dell'ultima formulazione.
+
+Le copie ricevute, i loro hash e le date accertabili sono elencati nell'
+[indice di provenienza](research_sources/PROVENANCE_2026-09-27.md). L'ordine di
+caricamento non determina da solo la precedenza scientifica tra documenti
+senza data interna o versione dichiarata.
 
 ## Confini della prova
 

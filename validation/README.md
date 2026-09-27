@@ -68,6 +68,19 @@ A passing empirical gate establishes empirical compatibility for the tested
 families, not universal proof.
 <!-- PHI:EMPIRICAL_GATES:END -->
 
+## Audit esterno del confronto del 25 settembre
+
+`gates/stress_test_artifact_audit.py` accetta una cartella locale contenente
+`stress_test_results.csv`, `stress_test.log` e `stress_test_comparison.png`.
+Confronta gli SHA-256 e i conteggi con il
+[registro del confronto](../docs/validation/ADVERSARIAL_STRESS_TEST_2026-09-25.md).
+I tre output e il generatore originale non fanno parte del checkout; questo
+audit non è incluso nel runner permanente e non riproduce la simulazione.
+
+```bash
+python validation/gates/stress_test_artifact_audit.py /percorso/agli/output_originali
+```
+
 <!-- PHI:ACCESSIBLE_DERIVABILITY_VALIDATION:START -->
 ## Accessible Derivability / Scale Reopening
 

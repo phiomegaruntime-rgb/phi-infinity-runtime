@@ -14,6 +14,8 @@ Deterministic bottom-up relational computing framework for multi-agent governanc
 (Italian). It records the conceptual sequence `A: solution -> B: derivation path
 -> C: formalization`, the status of the newer time and phase-transition
 proposals, and what is still absent from this frozen runtime. The
+[research-source provenance index](docs/research_sources/PROVENANCE_2026-09-27.md)
+lists the supplied manuscript copies and verifiable dates. The
 [25 September stress-test summary](docs/validation/ADVERSARIAL_STRESS_TEST_2026-09-25.md)
 show 20 commits, 80 rejections, and **no** `M_gate` stop in 100 cycles. This
 simulation is separate from the `src/` engine and does not establish physical
