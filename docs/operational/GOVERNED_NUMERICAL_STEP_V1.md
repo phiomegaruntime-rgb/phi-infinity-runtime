@@ -23,12 +23,13 @@ With `opt_in=True`, the governed path is:
 2. `GovernedPhiStepper.step()` takes the same authority lock and checks that
    the required support is present, not awaiting reopen, and still at the
    verified revision.
-3. It snapshots the actual engine's `pos`, `S`, and `R`, then calls that same
-   engine instance's existing `PhiSubstrateEngine.step()`, without changing its
-   equations.
-4. It validates the resulting arrays' shapes, dtypes, and finite values. If
-   transformation or validation raises, it restores all three arrays and the
-   step parameters before returning the error.
+3. It copies the actual engine into a private candidate and runs the existing
+   `PhiSubstrateEngine.step()` implementation there, with unchanged equations.
+4. It validates shapes, dtypes and finite values, then rechecks the original
+   verified support revision. Any change, including reentrant withdrawal,
+   republishing or withdrawal/restoration/reverification, discards the attempt.
+   Only a successful candidate replaces the original engine's three arrays.
+   Exceptions leave the original arrays and existing references untouched.
 
 The report contains hashes of the actual numerical arrays immediately before
 and after the transition, plus the metrics returned by the engine. It is an
@@ -64,8 +65,17 @@ the original engine arrays are changed.
 The process-local `RLock` serializes updates made through the configured
 authority object with governed steps. If withdrawal obtains the lock first, a
 step is rejected; if a step already holds the lock, it completes before the
-withdrawal takes effect. A transformation exception restores the original
-numerical arrays before the governed call exits.
+withdrawal takes effect. Same-thread updates are possible with the reentrant
+lock, but invalidate the candidate before publication. A transformation exception
+discards the candidate without mutating the original numerical arrays.
+
+Independent regression: four adversarial checks fail on the initial successor
+`f639e46` (three reentrant support changes and retained-array references after
+an injected error). All nine governed-step checks pass after the repair.
+The complete independent suite passes: 312 tests, 13.38 seconds, with bytecode
+and the pytest cache provider disabled. The original 303 tests are unchanged.
+Publication replaces three array attributes; it is not an atomic multi-array
+snapshot for unsynchronized readers. Old references remain old after success.
 
 Direct calls to the historical `engine.step()` and direct writes to the
 engine's public arrays bypass this gate and are not protected by its lock.
