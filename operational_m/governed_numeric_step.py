@@ -8,6 +8,7 @@ engine's equations or its historical, ungoverned entry point.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from copy import deepcopy
 from hashlib import sha256
 from threading import RLock
 from typing import Any
@@ -147,9 +148,8 @@ class GovernedPhiStepper:
     """Gate real numerical state advancement behind current support.
 
     The authority lock serializes support updates with governed steps. The
-    actual engine is stepped through its existing ``step`` method after its
-    numeric state has been snapshotted. Any transformation or validation
-    error restores those arrays and the temporarily adjusted step parameters.
+    existing engine implementation runs on a private candidate. Its arrays
+    are published only if the verified support revision still holds.
     """
 
     def __init__(
@@ -194,26 +194,30 @@ class GovernedPhiStepper:
                 name: getattr(self.engine, name).copy()
                 for name in ("pos", "S", "R")
             }
-            before_parameters = (self.engine.mu, self.engine.eta)
             before = _state_digest(self.engine)
-            try:
-                metrics = self.engine.step(
-                    mechanical_progress=mechanical_progress
+            verified_revision = authority._revision
+            candidate = deepcopy(self.engine)
+            metrics = candidate.step(mechanical_progress=mechanical_progress)
+            _validate_state(candidate, before_arrays)
+            after = _state_digest(candidate)
+            # RLock permits same-thread callbacks to update the authority.
+            # Even revoke/restore/verify cannot reuse this attempted step.
+            if (authority._revision != verified_revision
+                or authority._verified_revision != verified_revision
+                or authority._support != support
+                or authority._reopen_required):
+                raise FreshVerificationRequired(
+                    "Support changed during calculation; candidate discarded."
                 )
-                _validate_state(self.engine, before_arrays)
-                after = _state_digest(self.engine)
-            except BaseException:
-                self.engine.pos = before_arrays["pos"]
-                self.engine.S = before_arrays["S"]
-                self.engine.R = before_arrays["R"]
-                self.engine.mu, self.engine.eta = before_parameters
-                raise
+            self.engine.pos, self.engine.S, self.engine.R = (
+                candidate.pos, candidate.S, candidate.R
+            )
 
             self._step_number += 1
             return GovernedStepReport(
                 step_number=self._step_number,
                 support_id=support.support_id,
-                support_revision=authority._revision,
+                support_revision=verified_revision,
                 state_before_sha256=before,
                 state_after_sha256=after,
                 metrics=dict(metrics),
