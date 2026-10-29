@@ -120,11 +120,30 @@ wrong-model/source or wrong-state dependencies reject without committing.
 The M-native result remains `UNRESOLVED`; successful execution means only that
 an authorized external issuer attested these inputs and the existing equations
 were run. A valid signature does not prove the assertion physically true, and
-does not derive M authorization. The assertion set must be explicitly
-re-attested for a later state revision.
+does not derive M authorization. A later state revision requires a newly signed
+operation manifest bound to that state. Parameter assertions may be reused only
+while their exact values, scopes and revisions remain current; an old operation
+cannot advance a new state.
 
 The two-node regression uses the independently recorded state and unchanged
 equations: with `mu=0.05`, the first energy component changes by
 `-0.002733781888455633` while the total remains `3.1`; with known `mu=0`,
 energy exchange is zero while independent geometry still changes. These are
 equation-specific observations, not universal M derivations.
+
+The operational path verifies the actual stored state bytes against their signed
+checksum, validates array shapes and finiteness before calculation, and rejects
+invalid candidate results before publication. A finite parameter that overflows
+the equations does not persist invalid state. Concurrent identical requests
+return the same committed result and apply one transition. A different
+intervening transition invalidates the stale candidate without reverting it.
+
+Independent regressions demonstrate three failures on `72512c8`: overflow was
+committed, altered initial bytes could retain the old claimed checksum, and
+concurrent duplicate delivery could fail instead of returning the stored result.
+The repaired path additionally passes successive positive operations through two
+distinct real HTTP client processes and retains state after service restart.
+Dependency output fragments include issuer identity, assertion digest, progress,
+state versions and signed-request digest as well as parameter values/revisions.
+These guarantees use the previously stated operator trust model; this path does
+not establish an external physical effect or native M theorem.
