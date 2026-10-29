@@ -97,10 +97,15 @@ def test_withdraw_restore_reopen_and_fresh_verify_state_transitions():
     authority.verify()
     before = state(engine)
 
+    original_refs = (engine.pos, engine.S, engine.R)
+
     authority.withdraw_support()
     with pytest.raises(SupportUnavailable):
         stepper.step()
     assert_state_equal(engine, before)
+
+    for original_ref, expected in zip(original_refs, before):
+        assert np.array_equal(original_ref, expected)
 
     authority.publish_support(
         support_id=SUPPORT_ID,
@@ -142,6 +147,7 @@ def test_transformation_error_on_candidate_does_not_partially_update_engine(
     stepper = GovernedPhiStepper(engine, authority, opt_in=True)
     authority.verify()
     before = state(engine)
+    original_refs = (engine.pos, engine.S, engine.R)
 
     def mutate_candidate_then_fail(candidate: PhiSubstrateEngine):
         candidate.pos[0, 0] += 1000.0
@@ -157,6 +163,8 @@ def test_transformation_error_on_candidate_does_not_partially_update_engine(
     with pytest.raises(RuntimeError, match="injected transformation failure"):
         stepper.step()
     assert_state_equal(engine, before)
+    for original_ref, expected in zip(original_refs, before):
+        assert np.array_equal(original_ref, expected)
 
 
 def test_concurrent_withdrawal_serializes_after_an_in_flight_governed_step(
@@ -208,3 +216,44 @@ def test_concurrent_withdrawal_serializes_after_an_in_flight_governed_step(
     assert not step_errors
     assert withdrawal_done.is_set()
     assert authority.snapshot().support is None
+
+
+@pytest.mark.parametrize("change", ["withdraw", "republish", "withdraw_restore"])
+def test_reentrant_support_change_discards_candidate_and_preserves_aliases(
+    monkeypatch, change,
+):
+    engine = make_engine()
+    authority = authority_with_support()
+    authority.verify()
+    stepper = GovernedPhiStepper(engine, authority, opt_in=True)
+    before = state(engine)
+    refs = (engine.pos, engine.S, engine.R)
+    original = PhiSubstrateEngine._step_phi_mechanics
+
+    def change_during_calculation(candidate):
+        if change != "republish":
+            authority.withdraw_support()
+        if change != "withdraw":
+            authority.publish_support(support_id=SUPPORT_ID, statement="new assertion")
+            if change == "withdraw_restore":
+                authority.reopen()
+            authority.verify()
+        return original(candidate)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(PhiSubstrateEngine, "_step_phi_mechanics", change_during_calculation)
+        with pytest.raises(FreshVerificationRequired):
+            stepper.step()
+    assert_state_equal(engine, before)
+    for ref, expected in zip(refs, before):
+        assert np.array_equal(ref, expected)
+    if change == "withdraw":
+        with pytest.raises(SupportUnavailable):
+            stepper.step()
+        authority.publish_support(support_id=SUPPORT_ID, statement="restored")
+        authority.reopen()
+    authority.verify()
+    report = stepper.step()
+    assert report.step_number == 1
+    assert report.support_revision == authority.snapshot().revision
+    assert report.state_before_sha256 != report.state_after_sha256
