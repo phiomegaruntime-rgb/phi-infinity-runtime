@@ -42,13 +42,17 @@ def _sha_file(path: Path) -> str:
     return sha256(path.read_bytes()).hexdigest()
 
 
-def compute_runtime_identity() -> dict[str, object]:
+def compute_runtime_identity(
+    root: Path = ROOT,
+    executable_path: Path | None = None,
+) -> dict[str, object]:
+    root = Path(root).resolve()
     for relative, expected in FROZEN_SOURCE_HASHES.items():
-        actual = _sha_file(ROOT / relative)
+        actual = _sha_file(root / relative)
         if actual != expected:
             raise IdentityMismatch(f"frozen authority hash mismatch: {relative}")
 
-    actual_contract = _sha_file(ROOT / CONTRACT_PATH)
+    actual_contract = _sha_file(root / CONTRACT_PATH)
     if actual_contract != CONTRACT_SHA256:
         raise IdentityMismatch("completion contract hash mismatch")
 
@@ -61,15 +65,15 @@ def compute_runtime_identity() -> dict[str, object]:
         "operational_m", "independent_runtime",
     ):
         source_paths.update(
-            path.relative_to(ROOT).as_posix()
-            for path in (ROOT / package).rglob("*.py")
+            path.relative_to(root).as_posix()
+            for path in (root / package).rglob("*.py")
         )
     file_hashes = {
-        relative: _sha_file(ROOT / relative)
+        relative: _sha_file(root / relative)
         for relative in sorted(source_paths)
     }
 
-    executable = Path(sys.executable).resolve()
+    executable = Path(executable_path or sys.executable).resolve()
     executable_hash = _sha_file(executable)
     manifest = {
         "format": "phi-independent-runtime-identity-v1",

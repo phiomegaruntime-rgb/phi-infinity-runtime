@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import tempfile
 
 import pytest
@@ -12,6 +13,8 @@ import pytest
 from independent_runtime.identity import (
     CONTRACT_PATH,
     CONTRACT_SHA256,
+    FROZEN_SOURCE_HASHES,
+    IdentityMismatch,
     ROOT,
     canonical_json,
     compute_runtime_identity,
@@ -115,6 +118,50 @@ def test_runtime_identity_binds_actual_executable_and_source_bytes(tmp_path):
     assert identity["python_executable_sha256"]
     assert identity["sources"]["src/core.py"]
     assert "python_executable_sha256" in identity
+
+    fixture_root = tmp_path / "identity-root"
+    for directory in (
+        "src", "m_machine", "experimental_m_runtime_v2",
+        "operational_m", "independent_runtime",
+    ):
+        shutil.copytree(ROOT / directory, fixture_root / directory)
+    for relative in (*FROZEN_SOURCE_HASHES, CONTRACT_PATH):
+        destination = fixture_root / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / relative, destination)
+    executable_copy = tmp_path / "python-executable-copy"
+    shutil.copyfile(Path(sys.executable).resolve(), executable_copy)
+
+    baseline = compute_runtime_identity(
+        fixture_root, executable_path=executable_copy
+    )
+    core_copy = fixture_root / "src/core.py"
+    original_core = core_copy.read_bytes()
+    core_copy.write_bytes(original_core + b"\n# altered byte\n")
+    changed_code = compute_runtime_identity(
+        fixture_root, executable_path=executable_copy
+    )
+    assert changed_code["runtime_sha256"] != baseline["runtime_sha256"]
+
+    core_copy.write_bytes(original_core)
+    executable_bytes = executable_copy.read_bytes()
+    executable_copy.write_bytes(executable_bytes + b"\x00")
+    changed_executable = compute_runtime_identity(
+        fixture_root, executable_path=executable_copy
+    )
+    assert changed_executable["runtime_sha256"] != baseline["runtime_sha256"]
+
+    core_copy.write_bytes(original_core)
+    source = fixture_root / next(iter(FROZEN_SOURCE_HASHES))
+    source.write_bytes(source.read_bytes() + b"\n")
+    with pytest.raises(IdentityMismatch, match="frozen authority hash"):
+        compute_runtime_identity(fixture_root, executable_path=executable_copy)
+
+    source.write_bytes((ROOT / next(iter(FROZEN_SOURCE_HASHES))).read_bytes())
+    contract_copy = fixture_root / CONTRACT_PATH
+    contract_copy.write_bytes(contract_copy.read_bytes() + b"\n")
+    with pytest.raises(IdentityMismatch, match="completion contract hash"):
+        compute_runtime_identity(fixture_root, executable_path=executable_copy)
 
 
 def test_signed_external_support_is_not_an_m_numeric_authorization(tmp_path):
