@@ -151,6 +151,17 @@ def test_runtime_identity_binds_actual_executable_and_source_bytes(tmp_path):
     )
     assert changed_executable["runtime_sha256"] != baseline["runtime_sha256"]
 
+    store, private, _ = create_store(tmp_path)
+    stale_identity_envelope = signed_envelope(
+        private,
+        action="support.publish",
+        request_id="stale-runtime-identity",
+        nonce="stale-runtime-nonce",
+        runtime_id=str(changed_executable["runtime_sha256"]),
+    )
+    with pytest.raises(RequestRejected, match="substitute authority"):
+        store.process(stale_identity_envelope)
+
     core_copy.write_bytes(original_core)
     source = fixture_root / next(iter(FROZEN_SOURCE_HASHES))
     source.write_bytes(source.read_bytes() + b"\n")
@@ -188,6 +199,20 @@ def test_signed_external_support_is_not_an_m_numeric_authorization(tmp_path):
     assert after["state_version"] == before["state_version"]
     assert result["frontier_fragment"].endswith(
         "FIRST_MECHANICAL_INFERENCE_RULE_FRONTIER"
+    )
+    stages = result["protocol_stages"]
+    assert stages["conceptual"]["status"] == "UNRESOLVED"
+    assert "No authorized positive mechanical inference rule" in (
+        stages["conceptual"]["missing_premise"]
+    )
+    assert stages["operational_path"]["entrypoint"] == (
+        "src.core.PhiSubstrateEngine.step"
+    )
+    assert len(stages["operational_path"]["entrypoint_source_sha256"]) == 64
+    assert stages["numerical"]["status"] == "NOT_EXECUTED"
+    assert (
+        stages["numerical"]["state_before_sha256"]
+        == stages["numerical"]["state_after_sha256"]
     )
 
 
