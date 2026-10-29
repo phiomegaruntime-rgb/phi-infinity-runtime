@@ -155,6 +155,14 @@ def test_attested_two_node_step_matches_original_engine(tmp_path):
         for ref in output_graph.path
     )
     assert any(ref.value.startswith("fragment:transformation:") for ref in output_graph.path)
+    assert any(ref.value == "fragment:dependency:mu:issuer_key_id:issuer-a"
+               for ref in output_graph.nodes)
+    assert any(ref.value == "fragment:execution:mechanical-progress:1.0"
+               for ref in output_graph.path)
+    assert any(ref.value == "fragment:execution:state-version-after:1"
+               for ref in output_graph.path)
+    assert any(ref.value.startswith("fragment:dependency:mu:assertion_sha256:")
+               for ref in output_graph.nodes)
 
 
 def test_known_zero_mu_does_not_block_independent_geometry_change(tmp_path):
@@ -270,3 +278,111 @@ def test_calculation_error_discards_candidate_and_preserves_durable_arrays(
     assert after["state_sha256"] == before["state_sha256"]
     assert after["state_version"] == before["state_version"]
     assert tuple(map(id, retained["refs"])) == retained["ids"]
+
+
+def test_overflow_candidate_is_rejected_without_publishing(tmp_path):
+    store, private, _, _, dependencies = _setup(tmp_path, _values(1e308))
+    _install_independently_reported_state(store)
+    before = store.snapshot()
+    with np.errstate(all="ignore"):
+        with pytest.raises(RequestRejected, match="non-finite"):
+            store.process(_request(store, private, dependencies))
+    assert store.snapshot() == before
+
+
+def test_actual_initial_bytes_must_match_signed_hash(tmp_path):
+    store, private, _, _, dependencies = _setup(tmp_path, _values(.05))
+    request = _request(store, private, dependencies)
+    before = store.snapshot()
+    corrupted = before["state"]
+    corrupted["S"][0][0] += 1
+    with sqlite3.connect(store.path) as db:
+        db.execute("UPDATE numeric_state SET state_json=? WHERE id=1",
+                   (canonical_json(corrupted).decode(),))
+    with pytest.raises(RequestRejected, match="hash|invalid"):
+        store.process(request)
+    with sqlite3.connect(store.path) as db:
+        assert db.execute("SELECT version FROM numeric_state").fetchone()[0] == 0
+        assert db.execute("SELECT count(*) FROM requests WHERE request_id='equations-step'").fetchone()[0] == 0
+
+
+def test_concurrent_duplicate_returns_same_committed_result(tmp_path, monkeypatch):
+    from threading import Barrier
+    from concurrent.futures import ThreadPoolExecutor
+    store, private, _, _, dependencies = _setup(tmp_path, _values(.05))
+    request = _request(store, private, dependencies)
+    rendezvous = Barrier(2)
+    original = PhiSubstrateEngine.step
+
+    def together(engine, mechanical_progress=1.):
+        rendezvous.wait(timeout=5)
+        return original(engine, mechanical_progress)
+
+    monkeypatch.setattr(PhiSubstrateEngine, "step", together)
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        first, second = [future.result(timeout=10) for future in
+                         [pool.submit(store.process, request), pool.submit(store.process, request)]]
+    assert first == second
+    assert store.snapshot()["state_version"] == 1
+
+
+def test_two_real_http_clients_execute_successive_attested_steps(tmp_path):
+    from independent_runtime.orchestrator import RuntimeOrchestrator
+    store, private, _, _, dependencies = _setup(tmp_path, _values(.05))
+    issuer = store.issuers["issuer-a"]
+    trust = tmp_path / "trust.json"
+    trust.write_text(json.dumps({"issuers": [{"key_id": "issuer-a",
+        "public_key_pem": issuer.public_key_pem,
+        "allowed_support_ids": list(issuer.allowed_support_ids)}]}))
+    orchestrator = RuntimeOrchestrator(store.path, trust)
+    orchestrator.start()
+    try:
+        requests = []
+        runs = []
+        for number in range(2):
+            request = _request(store, private, dependencies)
+            request.update(request_id=f"http-step-{number}", nonce=f"http-nonce-{number}")
+            request["signature"] = _sign(private, {k:v for k,v in request.items() if k != "signature"})
+            path = tmp_path / f"step-{number}.json"
+            path.write_text(json.dumps(request))
+            result = orchestrator.run_client(path)
+            assert result.returncode == 0, result.stderr
+            graph = decode_graph(json.loads(result.stdout)["graph"])
+            assert any(ref.value == "fragment:decision:EQUATIONS_EXECUTED_NOT_M_AUTHORIZED"
+                       for ref in graph.nodes)
+            runs.append(result)
+            requests.append(request)
+        assert runs[0].pid != runs[1].pid
+        assert store.snapshot()["state_version"] == 2
+        # A newly signed request bound to the first state must fail.
+        stale = dict(requests[0])
+        stale.update(request_id="http-stale", nonce="http-stale-nonce")
+        stale["signature"] = _sign(private, {k:v for k,v in stale.items() if k != "signature"})
+        with pytest.raises(RequestRejected, match="state or revision changed"):
+            store.process(stale)
+    finally:
+        orchestrator.stop()
+    restarted = DurableRuntimeStore(store.path, store.issuers)
+    assert restarted.snapshot()["state_version"] == 2
+
+
+def test_reentrant_state_change_discards_stale_outer_calculation(tmp_path, monkeypatch):
+    store, private, _, _, dependencies = _setup(tmp_path, _values(.05))
+    outer = _request(store, private, dependencies)
+    inner = dict(outer)
+    inner.update(request_id="inner-step", nonce="inner-nonce")
+    inner["signature"] = _sign(private, {k:v for k,v in inner.items() if k != "signature"})
+    original = PhiSubstrateEngine.step
+    committed = {}
+
+    def advance_during_calculation(engine, mechanical_progress=1.):
+        if not committed:
+            committed["started"] = True
+            committed["result"] = store.process(inner)
+        return original(engine, mechanical_progress)
+
+    monkeypatch.setattr(PhiSubstrateEngine, "step", advance_during_calculation)
+    with pytest.raises(RequestRejected, match="state or revision changed"):
+        store.process(outer)
+    assert store.snapshot()["state_version"] == 1
+    assert store.snapshot()["state_sha256"] == committed["result"]["state_after_sha256"]
