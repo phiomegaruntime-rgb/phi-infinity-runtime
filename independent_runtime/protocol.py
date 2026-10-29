@@ -158,3 +158,66 @@ def make_unresolved_output(
         raise FragmentProtocolError("internal result graph construction failed")
     return result
 
+
+def make_equations_output(
+    graph: FragmentGraph,
+    receipt_digest: str,
+    dependencies: list[dict[str, Any]],
+    state_before_sha256: str,
+    state_after_sha256: str,
+) -> FragmentGraph:
+    """Represent externally attested inputs and actual numeric changes as fragments."""
+    nodes = dict(graph.nodes)
+    nodes.setdefault(KIND_OUTPUT, FragmentNode(KIND_OUTPUT, KIND_ATOM, ()))
+    nodes.setdefault(KIND_RECEIPT, FragmentNode(KIND_RECEIPT, KIND_ATOM, ()))
+    refs: list[FragmentRef] = []
+    for item in dependencies:
+        name = item["name"]
+        prefix = f"fragment:dependency:{name}"
+        evidence = []
+        for field in (
+            "support_id", "revision", "value", "scope",
+            "model_sha256", "source_sha256",
+        ):
+            ref = FragmentRef(f"{prefix}:{field}:{item[field]}")
+            nodes[ref] = FragmentNode(ref, KIND_ATOM, ())
+            evidence.append(ref)
+        provenance = FragmentRef(f"{prefix}:provenance")
+        nodes[provenance] = FragmentNode(
+            provenance, KIND_FRAGMENT, tuple(evidence)
+        )
+        refs.append(provenance)
+    before = FragmentRef(f"fragment:state:before:{state_before_sha256}")
+    after = FragmentRef(f"fragment:state:after:{state_after_sha256}")
+    nodes[before] = FragmentNode(before, KIND_ATOM, ())
+    nodes[after] = FragmentNode(after, KIND_ATOM, ())
+    transformation = FragmentRef(f"fragment:transformation:{receipt_digest}")
+    nodes[transformation] = FragmentNode(
+        transformation, KIND_FRAGMENT, (before, after, *refs)
+    )
+    decision = FragmentRef(
+        "fragment:decision:EQUATIONS_EXECUTED_NOT_M_AUTHORIZED"
+    )
+    receipt = FragmentRef(f"fragment:receipt:{receipt_digest}")
+    output = FragmentRef(f"fragment:output:{receipt_digest}")
+    root = FragmentRef(f"fragment:infinito:equations:{receipt_digest}")
+    nodes[decision] = FragmentNode(decision, KIND_ATOM, ())
+    nodes[receipt] = FragmentNode(
+        receipt, KIND_RECEIPT, (decision, graph.target, transformation)
+    )
+    nodes[output] = FragmentNode(
+        output, KIND_OUTPUT, (receipt, transformation, *refs)
+    )
+    nodes[root] = FragmentNode(
+        root, KIND_INFINITO,
+        (graph.infinito, graph.authority, graph.target, graph.machine, output),
+    )
+    result = FragmentGraph(
+        root, graph.authority, graph.target, graph.machine,
+        graph.path + tuple(refs) + (before, after, transformation, decision, receipt, output),
+        nodes,
+    )
+    if not result.validate_closed().is_closed:
+        raise FragmentProtocolError("equations result graph is not closed")
+    return result
+

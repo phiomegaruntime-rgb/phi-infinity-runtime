@@ -5,12 +5,15 @@ from dataclasses import dataclass
 from hashlib import sha256
 import inspect
 import json
+import math
 import os
 from pathlib import Path
 import sqlite3
 import subprocess
 import tempfile
 from typing import Any, Mapping
+
+import numpy as np
 
 from m_machine.proof_kernel import (
     FIRST_MECHANICAL_INFERENCE_RULE_FRONTIER,
@@ -27,6 +30,7 @@ from .protocol import (
     FragmentProtocolError,
     decode_graph,
     encode_graph,
+    make_equations_output,
     make_request_graph,
     make_unresolved_output,
 )
@@ -50,7 +54,10 @@ ENVELOPE_FIELDS = {
     "action", "request_id", "nonce", "key_id", "support_id",
     "statement", "graph", "signature",
 }
-ALLOWED_ACTIONS = {"support.publish", "support.revoke", "numeric.step"}
+ALLOWED_ACTIONS = {
+    "support.publish", "support.revoke", "numeric.step",
+    "equations.step.attested",
+}
 
 
 def _verify_ed25519(public_pem: str, message: bytes, signature: bytes) -> bool:
@@ -88,7 +95,9 @@ class DurableRuntimeStore:
     """SQLite decision/state transaction with immutable hash-chained audit.
 
     The M kernel is fixed in-process and has no positive mechanical rules.
-    Consequently numeric.step is always UNRESOLVED and never changes arrays.
+    Consequently numeric.step is always UNRESOLVED and never changes state.
+    A separate opt-in equations action executes the existing engine only from
+    signed, revision-bound external dependency assertions; this is not M proof.
     """
 
     def __init__(
@@ -329,7 +338,8 @@ class DurableRuntimeStore:
         for label, value in (("request_id", request_id), ("nonce", nonce),
                              ("key_id", key_id), ("support_id", support_id),
                              ("statement", statement)):
-            if type(value) is not str or not value.strip() or len(value) > 512:
+            limit = 65536 if label == "statement" else 512
+            if type(value) is not str or not value.strip() or len(value) > limit:
                 raise RequestRejected(f"invalid {label}")
         if support_id not in self.issuers.get(
             key_id, TrustedIssuer("", ())
@@ -345,6 +355,16 @@ class DurableRuntimeStore:
         issuer = self.issuers[key_id]
         if not _verify_ed25519(issuer.public_key_pem, payload_bytes, signature):
             raise RequestRejected("Ed25519 signature verification failed")
+
+        if action == "equations.step.attested":
+            return self._process_attested_equations_step(
+                envelope=envelope,
+                envelope_hash=envelope_hash,
+                key_id=key_id,
+                request_id=request_id,
+                nonce=nonce,
+                failpoint=failpoint,
+            )
 
         frontier, reason = self._proof_frontier()
         with _connect(self.path) as db:
@@ -531,6 +551,205 @@ class DurableRuntimeStore:
             if failpoint == "after_commit":
                 raise SimulatedCrash("injected failure after commit")
             return response
+
+    def _process_attested_equations_step(
+        self,
+        *,
+        envelope: dict[str, Any],
+        envelope_hash: str,
+        key_id: str,
+        request_id: str,
+        nonce: str,
+        failpoint: str | None,
+    ) -> dict[str, Any]:
+        try:
+            manifest = json.loads(envelope["statement"])
+        except (TypeError, ValueError) as exc:
+            raise RequestRejected("equation dependency manifest is invalid JSON") from exc
+        required = {
+            "expected_state_sha256", "expected_state_version",
+            "mechanical_progress", "dependencies",
+        }
+        if type(manifest) is not dict or set(manifest) != required:
+            raise RequestRejected("equation dependency manifest fields are not exact")
+        progress = manifest["mechanical_progress"]
+        if type(progress) not in (int, float) or not math.isfinite(progress) or progress <= 0:
+            raise RequestRejected("mechanical progress must be finite and positive")
+        expected_version = manifest["expected_state_version"]
+        expected_hash = manifest["expected_state_sha256"]
+        if type(expected_version) is not int or type(expected_hash) is not str:
+            raise RequestRejected("initial state binding is invalid")
+        names = ("sigma", "alpha", "beta", "lmbda", "gamma", "mu", "eta")
+        items = manifest["dependencies"]
+        if type(items) is not list or {item.get("name") for item in items if type(item) is dict} != set(names):
+            raise RequestRejected("each numerical dependency must be attested exactly once")
+        if len(items) != len(names):
+            raise RequestRejected("duplicate or missing numerical dependency")
+        model_hash = sha256(inspect.getsource(PhiSubstrateEngine).encode()).hexdigest()
+        source_hash = str(self.identity["sources"]["src/core.py"])
+        values: dict[str, float] = {}
+        expected_supports: dict[str, tuple[str, int, str]] = {}
+        for item in items:
+            fields = {
+                "name", "support_id", "revision", "value", "scope",
+                "model_sha256", "source_sha256", "assertion_statement",
+            }
+            if type(item) is not dict or set(item) != fields:
+                raise RequestRejected("dependency attestation fields are not exact")
+            name = item["name"]
+            if name not in names or name in values:
+                raise RequestRejected("duplicate or unknown numerical dependency")
+            if item["scope"] != f"PhiSubstrateEngine.parameter.{name}":
+                raise RequestRejected(f"wrong dependency scope: {name}")
+            if item["model_sha256"] != model_hash or item["source_sha256"] != source_hash:
+                raise RequestRejected(f"wrong model/source binding: {name}")
+            if type(item["value"]) not in (int, float) or not math.isfinite(item["value"]):
+                raise RequestRejected(f"dependency value unavailable or non-finite: {name}")
+            if type(item["revision"]) is not int or type(item["support_id"]) is not str:
+                raise RequestRejected(f"invalid dependency revision: {name}")
+            statement = item["assertion_statement"]
+            try:
+                claim = json.loads(statement)
+            except (TypeError, ValueError) as exc:
+                raise RequestRejected(f"invalid dependency claim: {name}") from exc
+            expected_claim = {
+                "name": name, "value": item["value"], "scope": item["scope"],
+                "model_sha256": model_hash, "source_sha256": source_hash,
+            }
+            if claim != expected_claim or canonical_json(claim).decode() != statement:
+                raise RequestRejected(f"dependency claim does not match consumed value: {name}")
+            values[name] = float(item["value"])
+            expected_supports[name] = (
+                item["support_id"], item["revision"],
+                sha256(canonical_json({
+                    "support_id": item["support_id"], "statement": statement,
+                })).hexdigest(),
+            )
+            if item["support_id"] not in self.issuers[key_id].allowed_support_ids:
+                raise RequestRejected(f"issuer is not authorized for dependency: {name}")
+
+        def snapshot_and_check(db: sqlite3.Connection) -> sqlite3.Row:
+            state = db.execute(
+                "SELECT state_json,state_sha256,version FROM numeric_state WHERE id=1"
+            ).fetchone()
+            if state["state_sha256"] != expected_hash or state["version"] != expected_version:
+                raise RequestRejected("initial numerical state or revision changed")
+            for name, (support_id, revision, digest) in expected_supports.items():
+                row = db.execute(
+                    "SELECT active,revision,assertion_sha256,issuer_key_id "
+                    "FROM support_state WHERE support_id=?", (support_id,)
+                ).fetchone()
+                if (
+                    row is None or not row["active"] or row["revision"] != revision
+                    or row["assertion_sha256"] != digest or row["issuer_key_id"] != key_id
+                ):
+                    raise RequestRejected(f"dependency missing, changed, or revoked: {name}")
+            return state
+
+        with _connect(self.path) as db:
+            db.execute("BEGIN IMMEDIATE")
+            duplicate = db.execute(
+                "SELECT envelope_sha256,response_json FROM requests WHERE request_id=?",
+                (request_id,),
+            ).fetchone()
+            if duplicate:
+                if duplicate["envelope_sha256"] != envelope_hash:
+                    raise RequestRejected("request_id reused with different bytes")
+                db.commit()
+                return json.loads(duplicate["response_json"])
+            issuer = db.execute(
+                "SELECT revoked FROM issuer_keys WHERE key_id=?", (key_id,)
+            ).fetchone()
+            if issuer is None or issuer["revoked"]:
+                raise RequestRejected("issuer key is revoked or unknown")
+            state = snapshot_and_check(db)
+            before_json = state["state_json"]
+            before_hash = state["state_sha256"]
+            version = state["version"]
+            if db.execute(
+                "SELECT 1 FROM used_nonces WHERE issuer_key_id=? AND nonce=?",
+                (key_id, nonce),
+            ).fetchone():
+                raise RequestRejected("replayed issuer nonce")
+            db.commit()
+
+        before = json.loads(before_json)
+        engine = PhiSubstrateEngine(n_nodes=len(before["R"]), seed=13, **values)
+        engine.pos = np.asarray(before["pos"], dtype=float).copy()
+        engine.S = np.asarray(before["S"], dtype=float).copy()
+        engine.R = np.asarray(before["R"], dtype=float).copy()
+        engine.step(mechanical_progress=progress)
+        after = {name: getattr(engine, name).tolist() for name in ("pos", "S", "R")}
+        after_json = canonical_json(after).decode()
+        after_hash = sha256(after_json.encode()).hexdigest()
+        used = [
+            {"name": name, "support_id": support_id, "revision": revision,
+             "value": values[name], "scope": f"PhiSubstrateEngine.parameter.{name}",
+             "model_sha256": model_hash, "source_sha256": source_hash}
+            for name, (support_id, revision, _) in expected_supports.items()
+        ]
+        receipt_hash = sha256(canonical_json({
+            "request_sha256": envelope_hash,
+            "state_before_sha256": before_hash,
+            "state_after_sha256": after_hash,
+            "dependencies": used,
+        })).hexdigest()
+        output_graph = make_equations_output(
+            decode_graph(envelope["graph"]), receipt_hash, used,
+            before_hash, after_hash,
+        )
+        response = {
+            "graph": encode_graph(output_graph),
+            "receipt_fragment": f"fragment:receipt:{receipt_hash}",
+            "status": "EQUATIONS_EXECUTED_EXTERNAL_ATTESTATIONS_NOT_M_AUTHORIZATION",
+            "m_status": "UNRESOLVED",
+            "dependencies_used": used,
+            "mechanical_progress": progress,
+            "state_before_sha256": before_hash,
+            "state_after_sha256": after_hash,
+            "state_version_before": version,
+            "state_version_after": version + 1,
+            "state_after": after,
+        }
+        with _connect(self.path) as db:
+            db.execute("BEGIN IMMEDIATE")
+            state = snapshot_and_check(db)
+            issuer = db.execute(
+                "SELECT revoked FROM issuer_keys WHERE key_id=?", (key_id,)
+            ).fetchone()
+            if issuer is None or issuer["revoked"]:
+                raise RequestRejected("issuer revoked during calculation")
+            if db.execute(
+                "SELECT 1 FROM used_nonces WHERE issuer_key_id=? AND nonce=?",
+                (key_id, nonce),
+            ).fetchone():
+                raise RequestRejected("nonce replayed during calculation")
+            db.execute(
+                "UPDATE numeric_state SET state_json=?,state_sha256=?,version=? WHERE id=1",
+                (after_json, after_hash, version + 1),
+            )
+            db.execute("INSERT INTO used_nonces VALUES(?,?,?)", (key_id, nonce, request_id))
+            audit_hash = self._append_audit(db, {
+                "action": "equations.step.attested", "request_id": request_id,
+                "request_sha256": envelope_hash, "m_status": "UNRESOLVED",
+                "dependencies_used": used, "state_before_sha256": before_hash,
+                "state_after_sha256": after_hash, "state_version": version + 1,
+                "runtime_sha256": self.runtime_id,
+            })
+            response["audit_head_sha256"] = audit_hash
+            response_json = canonical_json(response).decode()
+            db.execute(
+                "INSERT INTO requests VALUES(?,?,?,?,?)",
+                (request_id, envelope_hash, canonical_json(envelope).decode(),
+                 response_json, version + 1),
+            )
+            if failpoint == "before_commit":
+                db.rollback()
+                raise SimulatedCrash("injected failure before commit")
+            db.commit()
+            if failpoint == "after_commit":
+                raise SimulatedCrash("injected failure after commit")
+        return response
 
     def revoke_issuer(self, key_id: str, reason: str) -> None:
         """Local operator action; never exposed through the client API."""

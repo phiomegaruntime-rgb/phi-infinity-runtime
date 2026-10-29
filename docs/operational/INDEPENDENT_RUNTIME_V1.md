@@ -94,3 +94,37 @@ python -m independent_runtime.service \
 
 The client accepts only a signed request file and sends it to `/v1/submit`.
 Do not expose this service publicly or treat its signed assertions as M truth.
+
+## Explicit attested-equations opt-in
+
+The separate action `equations.step.attested` is an opt-in execution of the
+existing `PhiSubstrateEngine.step`; it is not the native M action
+`numeric.step`. The latter remains `UNRESOLVED` and cannot advance state.
+
+The signed operation manifest binds the initial state SHA-256 and version,
+mechanical progress, and exactly seven dependencies consumed by the current
+engine: `sigma`, `alpha`, `beta`, `lmbda`, `gamma`, `mu`, and `eta`. Each
+dependency has a separately published, revisioned assertion whose canonical
+statement binds the parameter name, actual numeric value (including a known
+zero), exact parameter scope, engine-model hash, and `src/core.py` hash. The
+issuer must be allowlisted for every dependency support ID. The operation
+signature covers the complete manifest; the service checks current support
+revision, assertion digest, issuer, state hash/version, and request nonce both
+before calculation and immediately before durable commit.
+
+The service loads the stored arrays into a provisional instance of the real
+engine and invokes its unchanged `step`. It records dependency IDs/revisions,
+values, state hashes and the transformation as closed protocol fragments.
+Missing, unavailable, non-finite, altered, stale, revoked, wrong-scope,
+wrong-model/source or wrong-state dependencies reject without committing.
+The M-native result remains `UNRESOLVED`; successful execution means only that
+an authorized external issuer attested these inputs and the existing equations
+were run. A valid signature does not prove the assertion physically true, and
+does not derive M authorization. The assertion set must be explicitly
+re-attested for a later state revision.
+
+The two-node regression uses the independently recorded state and unchanged
+equations: with `mu=0.05`, the first energy component changes by
+`-0.002733781888455633` while the total remains `3.1`; with known `mu=0`,
+energy exchange is zero while independent geometry still changes. These are
+equation-specific observations, not universal M derivations.
