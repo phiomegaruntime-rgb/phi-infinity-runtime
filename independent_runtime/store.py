@@ -44,6 +44,26 @@ class SimulatedCrash(RuntimeError):
     pass
 
 
+def _validate_numeric_state(state: object, expected_nodes: int | None = None) -> None:
+    """Validate the actual values consumed/published by the equation path."""
+    if type(state) is not dict or set(state) != {"pos", "S", "R"}:
+        raise RequestRejected("numerical state fields are invalid")
+    if type(state["R"]) is not list or not state["R"]:
+        raise RequestRejected("numerical state must contain nodes")
+    count = len(state["R"])
+    if expected_nodes is not None and count != expected_nodes:
+        raise RequestRejected("numerical state node count changed")
+    for name, shape in (("pos", (count, 2)), ("S", (count, 3)), ("R", (count,))):
+        try:
+            array = np.asarray(state[name])
+            valid = (array.shape == shape and array.dtype.kind in "ifu"
+                     and np.isfinite(array).all())
+        except (TypeError, ValueError, OverflowError):
+            valid = False
+        if not valid:
+            raise RequestRejected(f"numerical state {name} has invalid shape or non-finite values")
+
+
 @dataclass(frozen=True)
 class TrustedIssuer:
     public_key_pem: str
@@ -634,6 +654,13 @@ class DurableRuntimeStore:
             ).fetchone()
             if state["state_sha256"] != expected_hash or state["version"] != expected_version:
                 raise RequestRejected("initial numerical state or revision changed")
+            try:
+                decoded = json.loads(state["state_json"])
+                if sha256(canonical_json(decoded)).hexdigest() != state["state_sha256"]:
+                    raise RequestRejected("initial numerical state bytes do not match hash")
+                _validate_numeric_state(decoded)
+            except (TypeError, ValueError, KeyError) as exc:
+                raise RequestRejected("initial numerical state is invalid") from exc
             for name, (support_id, revision, digest) in expected_supports.items():
                 row = db.execute(
                     "SELECT active,revision,assertion_sha256,issuer_key_id "
@@ -680,13 +707,15 @@ class DurableRuntimeStore:
         engine.R = np.asarray(before["R"], dtype=float).copy()
         engine.step(mechanical_progress=progress)
         after = {name: getattr(engine, name).tolist() for name in ("pos", "S", "R")}
+        _validate_numeric_state(after, expected_nodes=len(before["R"]))
         after_json = canonical_json(after).decode()
         after_hash = sha256(after_json.encode()).hexdigest()
         used = [
             {"name": name, "support_id": support_id, "revision": revision,
              "value": values[name], "scope": f"PhiSubstrateEngine.parameter.{name}",
-             "model_sha256": model_hash, "source_sha256": source_hash}
-            for name, (support_id, revision, _) in expected_supports.items()
+             "model_sha256": model_hash, "source_sha256": source_hash,
+             "issuer_key_id": key_id, "assertion_sha256": digest}
+            for name, (support_id, revision, digest) in expected_supports.items()
         ]
         receipt_hash = sha256(canonical_json({
             "request_sha256": envelope_hash,
@@ -697,6 +726,8 @@ class DurableRuntimeStore:
         output_graph = make_equations_output(
             decode_graph(envelope["graph"]), receipt_hash, used,
             before_hash, after_hash,
+            mechanical_progress=progress, state_version_before=version,
+            state_version_after=version + 1, request_sha256=envelope_hash,
         )
         response = {
             "graph": encode_graph(output_graph),
@@ -713,6 +744,15 @@ class DurableRuntimeStore:
         }
         with _connect(self.path) as db:
             db.execute("BEGIN IMMEDIATE")
+            duplicate = db.execute(
+                "SELECT envelope_sha256,response_json FROM requests WHERE request_id=?",
+                (request_id,),
+            ).fetchone()
+            if duplicate:
+                if duplicate["envelope_sha256"] != envelope_hash:
+                    raise RequestRejected("request_id reused with different bytes")
+                db.commit()
+                return json.loads(duplicate["response_json"])
             state = snapshot_and_check(db)
             issuer = db.execute(
                 "SELECT revoked FROM issuer_keys WHERE key_id=?", (key_id,)

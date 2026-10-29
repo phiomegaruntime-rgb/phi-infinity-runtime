@@ -165,6 +165,11 @@ def make_equations_output(
     dependencies: list[dict[str, Any]],
     state_before_sha256: str,
     state_after_sha256: str,
+    *,
+    mechanical_progress: float,
+    state_version_before: int,
+    state_version_after: int,
+    request_sha256: str,
 ) -> FragmentGraph:
     """Represent externally attested inputs and actual numeric changes as fragments."""
     nodes = dict(graph.nodes)
@@ -178,6 +183,7 @@ def make_equations_output(
         for field in (
             "support_id", "revision", "value", "scope",
             "model_sha256", "source_sha256",
+            "issuer_key_id", "assertion_sha256",
         ):
             ref = FragmentRef(f"{prefix}:{field}:{item[field]}")
             nodes[ref] = FragmentNode(ref, KIND_ATOM, ())
@@ -187,6 +193,13 @@ def make_equations_output(
             provenance, KIND_FRAGMENT, tuple(evidence)
         )
         refs.append(provenance)
+    for name, value in (("mechanical-progress", mechanical_progress),
+                        ("state-version-before", state_version_before),
+                        ("state-version-after", state_version_after),
+                        ("signed-request-sha256", request_sha256)):
+        ref = FragmentRef(f"fragment:execution:{name}:{value}")
+        nodes[ref] = FragmentNode(ref, KIND_ATOM, ())
+        refs.append(ref)
     before = FragmentRef(f"fragment:state:before:{state_before_sha256}")
     after = FragmentRef(f"fragment:state:after:{state_after_sha256}")
     nodes[before] = FragmentNode(before, KIND_ATOM, ())
