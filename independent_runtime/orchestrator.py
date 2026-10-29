@@ -63,7 +63,8 @@ class RuntimeOrchestrator:
                 sys.executable, "-m", "independent_runtime.client",
                 "--url", self.url, "--request-file", str(request_file),
             ],
-            capture_output=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             text=True,
         )
         stdout, stderr = process.communicate(timeout=15)

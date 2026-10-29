@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import shutil
 import subprocess
+import tempfile
 
 import pytest
 
@@ -72,18 +73,21 @@ def signed_envelope(
         "graph": encode_graph(make_request_graph(str(identity))),
     }
     payload = canonical_json(envelope)
-    with subprocess.Popen(
-        [
-            "openssl", "pkeyutl", "-sign", "-inkey", str(private),
-            "-rawin", "-in", "/dev/stdin",
-        ],
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    ) as process:
-        signature, stderr = process.communicate(payload, timeout=5)
-        if process.returncode:
-            raise RuntimeError(stderr.decode())
+    with tempfile.TemporaryDirectory(prefix="phi-sign-") as temp:
+        message_path = Path(temp) / "message.bin"
+        signature_path = Path(temp) / "signature.bin"
+        message_path.write_bytes(payload)
+        subprocess.run(
+            [
+                "openssl", "pkeyutl", "-sign", "-inkey", str(private),
+                "-rawin", "-in", str(message_path), "-out",
+                str(signature_path),
+            ],
+            check=True,
+            capture_output=True,
+            timeout=5,
+        )
+        signature = signature_path.read_bytes()
     return {**envelope, "signature": base64.b64encode(signature).decode("ascii")}
 
 
@@ -119,7 +123,7 @@ def test_signed_external_support_is_not_an_m_numeric_authorization(tmp_path):
         private, action="support.publish", request_id="publish-1", nonce="n-1"
     )
     accepted = store.process(publish)
-    assert "EXTERNAL_ASSERTION_RECORDED_NOT_TRUTH" in {
+    assert "fragment:decision:EXTERNAL_ASSERTION_RECORDED_NOT_TRUTH" in {
         node["ref"] for node in accepted["graph"]["nodes"]
     }
     before = store.snapshot()
@@ -163,6 +167,17 @@ def test_false_unknown_altered_and_nonfragment_inputs_reject(
     assert store.snapshot()["audit_event_count"] == 0
 
 
+def test_signed_but_unauthorized_support_scope_is_rejected(tmp_path):
+    store, private, _ = create_store(tmp_path)
+    envelope = signed_envelope(
+        private, action="support.publish", request_id="out-of-scope",
+        nonce="scope-nonce", support_id="support:other-domain",
+    )
+    with pytest.raises(RequestRejected, match="unauthorized support scope"):
+        store.process(envelope)
+    assert store.snapshot()["audit_event_count"] == 0
+
+
 def test_substitute_authority_or_machine_fragment_rejects(tmp_path):
     store, private, _ = create_store(tmp_path)
     for index, field in enumerate(("authority", "machine")):
@@ -175,19 +190,47 @@ def test_substitute_authority_or_machine_fragment_rejects(tmp_path):
         envelope["graph"][field] = f"fragment:{field}:substitute"
         payload = {key: value for key, value in envelope.items() if key != "signature"}
         payload_bytes = canonical_json(payload)
-        with subprocess.Popen(
-            [
-                "openssl", "pkeyutl", "-sign", "-inkey",
-                str(private), "-rawin", "-in", "/dev/stdin",
-            ],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        ) as process:
-            signature, _ = process.communicate(payload_bytes, timeout=5)
+        with tempfile.TemporaryDirectory(prefix="phi-sign-substitute-") as temp:
+            message_path = Path(temp) / "message.bin"
+            signature_path = Path(temp) / "signature.bin"
+            message_path.write_bytes(payload_bytes)
+            subprocess.run(
+                [
+                    "openssl", "pkeyutl", "-sign", "-inkey", str(private),
+                    "-rawin", "-in", str(message_path), "-out",
+                    str(signature_path),
+                ],
+                check=True,
+                capture_output=True,
+                timeout=5,
+            )
+            signature = signature_path.read_bytes()
         envelope["signature"] = base64.b64encode(signature).decode()
         with pytest.raises(RequestRejected, match="substitute"):
             store.process(envelope)
+
+
+def test_receipt_shaped_fragment_cannot_be_injected_into_request_graph(tmp_path):
+    store, private, _ = create_store(tmp_path)
+    envelope = signed_envelope(
+        private, action="numeric.step", request_id="fake-receipt",
+        nonce="fake-receipt-nonce",
+    )
+    graph = envelope["graph"]
+    graph["nodes"].append({
+        "ref": "kind:receipt", "kind": "kind:atom", "edges": []
+    })
+    graph["nodes"].append({
+        "ref": "fragment:receipt:caller-forgery",
+        "kind": "kind:receipt",
+        "edges": ["fragment:target:numerical-step"],
+    })
+    for node in graph["nodes"]:
+        if node["ref"] == graph["infinito"]:
+            node["edges"].append("fragment:receipt:caller-forgery")
+    with pytest.raises(RequestRejected, match="substituted fragments"):
+        store.process(envelope)
+    assert store.snapshot()["audit_event_count"] == 0
 
 
 def test_nonce_replay_duplicate_idempotency_and_issuer_revocation(tmp_path):
@@ -217,6 +260,29 @@ def test_nonce_replay_duplicate_idempotency_and_issuer_revocation(tmp_path):
                                    (SUPPORT_ID,))},
     )
     assert restarted.snapshot()["audit_event_count"] == 2
+
+
+def test_revoked_support_cannot_authorize_a_later_numeric_request(tmp_path):
+    store, private, _ = create_store(tmp_path)
+    store.process(signed_envelope(
+        private, action="support.publish", request_id="support-on",
+        nonce="support-n1",
+    ))
+    revoked = store.process(signed_envelope(
+        private, action="support.revoke", request_id="support-off",
+        nonce="support-n2",
+    ))
+    assert "fragment:decision:SUPPORT_REVOKED" in {
+        node["ref"] for node in revoked["graph"]["nodes"]
+    }
+    with pytest.raises(RequestRejected, match="missing or revoked"):
+        store.process(signed_envelope(
+            private, action="numeric.step", request_id="after-revoke",
+            nonce="support-n3",
+        ))
+    snapshot = store.snapshot()
+    assert snapshot["supports"][0]["active"] == 0
+    assert snapshot["state_version"] == 0
 
 
 @pytest.mark.parametrize("failpoint", ["before_commit", "after_commit"])
@@ -258,8 +324,30 @@ def test_audit_is_append_only_and_chain_detects_tampering(tmp_path):
         db.execute("UPDATE audit_events SET event_json='{}' WHERE seq=1")
     with pytest.raises(sqlite3.IntegrityError, match="append-only"):
         db.execute("DELETE FROM audit_events")
+    db.execute("DROP TRIGGER audit_no_update")
+    db.execute("UPDATE audit_events SET event_json='{}' WHERE seq=1")
+    db.commit()
     db.close()
-    assert store.snapshot()["audit_event_count"] == 1
+    with pytest.raises(RequestRejected, match="audit integrity"):
+        DurableRuntimeStore(
+            store.path,
+            {"issuer-a": TrustedIssuer(store.issuers["issuer-a"].public_key_pem,
+                                       (SUPPORT_ID,))},
+        )
+
+
+def test_durable_numeric_state_checksum_detects_tampering(tmp_path):
+    store, _, _ = create_store(tmp_path)
+    import sqlite3
+
+    db = sqlite3.connect(store.path)
+    db.execute(
+        "UPDATE numeric_state SET state_json='{}' WHERE id=1"
+    )
+    db.commit()
+    db.close()
+    with pytest.raises(RequestRejected, match="state hash mismatch"):
+        store.snapshot()
 
 
 def test_two_distinct_client_processes_use_local_service_and_replay_after_restart(

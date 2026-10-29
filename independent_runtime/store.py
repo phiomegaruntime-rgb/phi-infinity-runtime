@@ -3,6 +3,7 @@ from __future__ import annotations
 import base64
 from dataclasses import dataclass
 from hashlib import sha256
+import inspect
 import json
 import os
 from pathlib import Path
@@ -26,6 +27,7 @@ from .protocol import (
     FragmentProtocolError,
     decode_graph,
     encode_graph,
+    make_request_graph,
     make_unresolved_output,
 )
 
@@ -135,6 +137,7 @@ class DurableRuntimeStore:
                 CREATE TABLE IF NOT EXISTS requests(
                     request_id TEXT PRIMARY KEY,
                     envelope_sha256 TEXT NOT NULL,
+                    envelope_json TEXT NOT NULL,
                     response_json TEXT NOT NULL,
                     state_version INTEGER NOT NULL
                 );
@@ -233,6 +236,17 @@ class DurableRuntimeStore:
                     raise RequestRejected(
                         f"issuer configuration changed for {key_id}"
                     )
+            state_row = db.execute(
+                "SELECT state_json,state_sha256 FROM numeric_state WHERE id=1"
+            ).fetchone()
+            try:
+                state_digest = sha256(
+                    canonical_json(json.loads(state_row["state_json"]))
+                ).hexdigest()
+            except (TypeError, ValueError, KeyError) as exc:
+                raise RequestRejected("durable numerical state is malformed") from exc
+            if state_digest != state_row["state_sha256"]:
+                raise RequestRejected("durable numerical state hash mismatch")
             self._verify_audit_chain(db)
 
     @staticmethod
@@ -300,6 +314,9 @@ class DurableRuntimeStore:
             raise RequestRejected("substitute machine fragment")
         if graph.target.value != "fragment:target:numerical-step":
             raise RequestRejected("wrong target fragment")
+        expected_graph = encode_graph(make_request_graph(self.runtime_id))
+        if encode_graph(graph) != expected_graph:
+            raise RequestRejected("request graph contains substituted fragments")
 
         action = envelope["action"]
         request_id = envelope["request_id"]
@@ -416,6 +433,36 @@ class DurableRuntimeStore:
                 "SELECT state_json,state_sha256,version FROM numeric_state WHERE id=1"
             ).fetchone()
             state_version = current_state["version"]
+            support_row = db.execute(
+                "SELECT active,assertion_sha256,revision FROM support_state "
+                "WHERE support_id=?",
+                (support_id,),
+            ).fetchone()
+            source_path_hash = str(
+                self.identity["sources"]["src/core.py"]
+            )
+            entrypoint_hash = sha256(
+                inspect.getsource(PhiSubstrateEngine.step).encode("utf-8")
+            ).hexdigest()
+            stages = {
+                "conceptual": {
+                    "status": "UNRESOLVED",
+                    "target": "authorization for protected numerical state advancement",
+                    "missing_premise": reason,
+                },
+                "operational_path": {
+                    "status": "IDENTIFIED_NOT_AUTHORIZED",
+                    "entrypoint": "src.core.PhiSubstrateEngine.step",
+                    "source_file_sha256": source_path_hash,
+                    "entrypoint_source_sha256": entrypoint_hash,
+                },
+                "numerical": {
+                    "status": "NOT_EXECUTED",
+                    "state_before_sha256": before_hash,
+                    "state_after_sha256": current_state["state_sha256"],
+                    "reason": "M authorization is UNRESOLVED; no state was changed",
+                },
+            }
             decision_text = {
                 "support.publish": "EXTERNAL_ASSERTION_RECORDED_NOT_TRUTH",
                 "support.revoke": "SUPPORT_REVOKED",
@@ -434,6 +481,7 @@ class DurableRuntimeStore:
                 "state_version": state_version,
                 "receipt_fragment": f"fragment:receipt:{receipt_id}",
                 "runtime_sha256": self.runtime_id,
+                "protocol_stages": stages,
             }
             # Decision, support revision, state snapshot and audit are committed
             # together. The numeric state is unchanged because M is unresolved.
@@ -449,9 +497,14 @@ class DurableRuntimeStore:
                     "action": action,
                     "key_id": key_id,
                     "support_id": support_id,
+                    "support_revision": support_row["revision"],
+                    "support_active": bool(support_row["active"]),
+                    "support_assertion_sha256": support_row["assertion_sha256"],
                     "outcome": outcome,
                     "m_status": "UNRESOLVED",
                     "frontier": frontier,
+                    "missing_premise": reason,
+                    "protocol_stages": stages,
                     "state_before_sha256": before_hash,
                     "state_after_sha256": current_state["state_sha256"],
                     "state_version": state_version,
@@ -462,8 +515,14 @@ class DurableRuntimeStore:
             response["audit_head_sha256"] = event_hash
             response_json = canonical_json(response).decode("utf-8")
             db.execute(
-                "INSERT INTO requests VALUES(?,?,?,?)",
-                (request_id, envelope_hash, response_json, state_version),
+                "INSERT INTO requests VALUES(?,?,?,?,?)",
+                (
+                    request_id,
+                    envelope_hash,
+                    canonical_json(envelope).decode("utf-8"),
+                    response_json,
+                    state_version,
+                ),
             )
             if failpoint == "before_commit":
                 db.rollback()
@@ -508,6 +567,11 @@ class DurableRuntimeStore:
             row = db.execute(
                 "SELECT state_json,state_sha256,version FROM numeric_state WHERE id=1"
             ).fetchone()
+            calculated_state_hash = sha256(
+                canonical_json(json.loads(row["state_json"]))
+            ).hexdigest()
+            if calculated_state_hash != row["state_sha256"]:
+                raise RequestRejected("durable numerical state hash mismatch")
             count = db.execute("SELECT COUNT(*) AS n FROM audit_events").fetchone()["n"]
             supports = [
                 dict(row)

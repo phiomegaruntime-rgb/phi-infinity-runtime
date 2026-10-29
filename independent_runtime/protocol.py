@@ -112,7 +112,7 @@ def make_request_graph(runtime_identity: str) -> FragmentGraph:
         ref: FragmentNode(ref, KIND_ATOM, ())
         for ref in (
             KIND_ATOM, KIND_AUTHORITY, KIND_FRAGMENT, KIND_INFINITO,
-            KIND_MACHINE, KIND_OUTPUT, KIND_RECEIPT, KIND_TARGET
+            KIND_MACHINE, KIND_TARGET
         )
     }
     nodes = {
@@ -141,6 +141,8 @@ def make_unresolved_output(
     output = FragmentRef(f"fragment:output:{receipt_digest}")
     root = FragmentRef(f"fragment:infinito:result:{receipt_digest}")
     nodes = dict(graph.nodes)
+    nodes.setdefault(KIND_OUTPUT, FragmentNode(KIND_OUTPUT, KIND_ATOM, ()))
+    nodes.setdefault(KIND_RECEIPT, FragmentNode(KIND_RECEIPT, KIND_ATOM, ()))
     nodes[decision] = FragmentNode(decision, KIND_ATOM, ())
     nodes[receipt] = FragmentNode(receipt, KIND_RECEIPT, (decision, graph.target))
     nodes[output] = FragmentNode(output, KIND_OUTPUT, (receipt, decision))

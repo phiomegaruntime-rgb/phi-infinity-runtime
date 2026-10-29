@@ -55,18 +55,15 @@ def compute_runtime_identity() -> dict[str, object]:
     source_paths = {
         *FROZEN_SOURCE_HASHES,
         CONTRACT_PATH,
-        "src/core.py",
-        "m_machine/proof_kernel.py",
-        "m_machine/mechanical_propositions.py",
-        "m_machine/receipts.py",
-        "experimental_m_runtime_v2/model.py",
-        "experimental_m_runtime_v2/runtime.py",
-        "operational_m/governed_numeric_step.py",
     }
-    source_paths.update(
-        path.relative_to(ROOT).as_posix()
-        for path in (ROOT / "independent_runtime").glob("*.py")
-    )
+    for package in (
+        "src", "m_machine", "experimental_m_runtime_v2",
+        "operational_m", "independent_runtime",
+    ):
+        source_paths.update(
+            path.relative_to(ROOT).as_posix()
+            for path in (ROOT / package).rglob("*.py")
+        )
     file_hashes = {
         relative: _sha_file(ROOT / relative)
         for relative in sorted(source_paths)
