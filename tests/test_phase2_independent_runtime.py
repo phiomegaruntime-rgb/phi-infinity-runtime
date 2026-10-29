@@ -152,15 +152,19 @@ def test_runtime_identity_binds_actual_executable_and_source_bytes(tmp_path):
     assert changed_executable["runtime_sha256"] != baseline["runtime_sha256"]
 
     store, private, _ = create_store(tmp_path)
-    stale_identity_envelope = signed_envelope(
-        private,
-        action="support.publish",
-        request_id="stale-runtime-identity",
-        nonce="stale-runtime-nonce",
-        runtime_id=str(changed_executable["runtime_sha256"]),
-    )
-    with pytest.raises(RequestRejected, match="substitute authority"):
-        store.process(stale_identity_envelope)
+    for label, altered in (
+        ("code", changed_code),
+        ("executable", changed_executable),
+    ):
+        stale_identity_envelope = signed_envelope(
+            private,
+            action="support.publish",
+            request_id=f"stale-runtime-{label}",
+            nonce=f"stale-runtime-nonce-{label}",
+            runtime_id=str(altered["runtime_sha256"]),
+        )
+        with pytest.raises(RequestRejected, match="substitute authority"):
+            store.process(stale_identity_envelope)
 
     core_copy.write_bytes(original_core)
     source = fixture_root / next(iter(FROZEN_SOURCE_HASHES))
