@@ -1,0 +1,43 @@
+"""Explicitly opt-in operational extensions kept outside the frozen M kernel."""
+
+from .transformation_bridge import (
+    AUTHORITY_HASH,
+    AUTHORITY_ID,
+    AUTHORITY_RANGE,
+    AUTHORITY_SOURCE,
+    OPERATIONAL_BRIDGE_VERSION,
+    OPERATIONAL_RULE_ID,
+    BridgeResult,
+    DifferenceCandidate,
+    OperationalAuthorityError,
+    OperationalBridge,
+    OperationalDecision,
+    OperationalPropositionType,
+    OperationalReceipt,
+    OperationalScope,
+    OptInRequired,
+    TransformationGrounding,
+    create_operational_bridge,
+    verify_operational_authority,
+)
+
+__all__ = [
+    "AUTHORITY_HASH",
+    "AUTHORITY_ID",
+    "AUTHORITY_RANGE",
+    "AUTHORITY_SOURCE",
+    "OPERATIONAL_BRIDGE_VERSION",
+    "OPERATIONAL_RULE_ID",
+    "BridgeResult",
+    "DifferenceCandidate",
+    "OperationalAuthorityError",
+    "OperationalBridge",
+    "OperationalDecision",
+    "OperationalPropositionType",
+    "OperationalReceipt",
+    "OperationalScope",
+    "OptInRequired",
+    "TransformationGrounding",
+    "create_operational_bridge",
+    "verify_operational_authority",
+]

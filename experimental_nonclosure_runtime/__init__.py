@@ -1,0 +1,45 @@
+"""Isolated experiment for ordinary, recursively reopenable non-closure."""
+
+from .model import (
+    ContinuationState,
+    DiscriminationRef,
+    FrontierAction,
+    FragmentRef,
+    FrontierRef,
+    LocalClosure,
+    NonClosureReceipt,
+    NonClosureResult,
+    NonClosureStatus,
+    NonClosureSubject,
+    OpenFrontier,
+    RuleRef,
+    RelationRef,
+    SpecificOpening,
+    SubjectKind,
+    SupportEnvelope,
+    SupportRef,
+)
+from .runtime import NON_CLOSURE_RULE, NonClosureRule, NonClosureRuntime
+
+__all__ = [
+    "ContinuationState",
+    "DiscriminationRef",
+    "FrontierAction",
+    "FragmentRef",
+    "FrontierRef",
+    "LocalClosure",
+    "NON_CLOSURE_RULE",
+    "NonClosureReceipt",
+    "NonClosureResult",
+    "NonClosureRule",
+    "NonClosureRuntime",
+    "NonClosureStatus",
+    "NonClosureSubject",
+    "OpenFrontier",
+    "RuleRef",
+    "RelationRef",
+    "SpecificOpening",
+    "SubjectKind",
+    "SupportEnvelope",
+    "SupportRef",
+]
