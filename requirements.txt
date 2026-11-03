@@ -1,3 +1,5 @@
-numpy
+# ndarray.dtype in-place rollback remains supported before NumPy 2.5.
+# NumPy 2.5 deprecates the setter; a future alias-safe redesign is separate.
+numpy>=2.3,<2.5
 scipy
 pytest

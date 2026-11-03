@@ -3,6 +3,7 @@ PHI-INFINITY (Phi-Infinity) - Core Invariant Engine
 Author: Massimiliano Brighindi (2026)
 """
 import numpy as np
+from src.effect_authorization import authorized_effect, attach_gate_to_engine
 
 class PhiSubstrateEngine:
     def __init__(self, n_nodes=60, sigma=1.2, alpha=0.04, beta=0.25, lmbda=0.01, gamma=0.3, mu=0.05, eta=0.01, seed=42):
@@ -22,6 +23,15 @@ class PhiSubstrateEngine:
             rng.uniform(0.5, 1.5, size=n_nodes)
         ])
         self.R = np.zeros(n_nodes)
+
+    def attach_gate(self, gate, support, *, sealed=False):
+        """Opt in to serialized support checks on public PHI effect paths.
+
+        Attach only a MultiAccessGating plus SynchronizedSupport; the same
+        provider must publish all cooperative support withdrawals. REOPEN
+        remains the caller's explicit responsibility after refusal.
+        """
+        attach_gate_to_engine(self, gate, support, sealed=sealed)
 
     def compute_coupling(self):
         diff = self.pos[np.newaxis, :, :] - self.pos[:, np.newaxis, :]
@@ -52,6 +62,7 @@ class PhiSubstrateEngine:
             "mean_structural_path_increment": float(np.mean(structural_path_increment))
         }
 
+    @authorized_effect
     def step(
         self,
         mechanical_progress=1.0,

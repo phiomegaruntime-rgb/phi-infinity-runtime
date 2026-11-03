@@ -565,3 +565,49 @@ See:
 
 `docs/validation/EMPIRICAL_REALITY_GATE_ALPHA_2026-08-30.md`
 <!-- PHI:EMPIRICAL_REALITY_ALPHA:END -->
+
+---
+
+## Independent opt-in gate verification and state protection (contribution)
+
+The frozen original numerical equations and the normal **unattached** engine
+behavior are preserved. Optional additions provide a test-only independent
+gate audit, fail-closed predicates, a synchronized guard on the two public
+real effects, supported-state rollback, a fixed-rule versioned access gate,
+and a sealed built-in numerical execution profile.
+
+Review the staged test and engineering evidence before enabling these features:
+
+- [Independent frozen gate audit](docs/validation/INDEPENDENT_GATE_AUDIT.md)
+- [Real-effect support transactions](docs/validation/REAL_EFFECT_SUPPORT_TRANSACTIONS.md)
+- [Engine-owned state transaction](docs/validation/ENGINE_STATE_TRANSACTION_REVIEW.md)
+- [Versioned quorum + enforced software REOPEN](docs/validation/VERSIONED_QUORUM_AND_REOPEN.md)
+- [Sealed opt-in PHI effect profile](docs/validation/SEALED_PHI_PROFILE.md)
+- [Contribution review matrix](docs/validation/CONTRIBUTION_REVIEW_MATRIX.md)
+
+Run the real native example with `python -m examples.versioned_sealed_gate`.
+C11 reference sources and the corresponding Python comparison tests are in
+`verification/c11/` and `tests/`. No physical sensor attestation or proof of
+M is asserted by these software tests.
+
+---
+
+## Independent contributor follow-up: guarded effects and deterministic REOPEN (2026-11-02)
+
+The optional guard contribution and its independently tested PR #3 follow-up
+are documented in
+[`docs/validation/PR3_REVIEW_FINDINGS_AND_REOPEN_POLICY.md`](docs/validation/PR3_REVIEW_FINDINGS_AND_REOPEN_POLICY.md).
+This local candidate fixes two independently reproduced reviewer defects: array dtype
+restoration after rejected callback mutations, and error-lock recovery for the
+versioned quorum protocol. The transaction now also preserves raw structured
+array padding bytes where supported and rejects metadata-only dtype changes
+that NumPy dtype equality does not detect. Historical text above describes the
+original research baseline; this addendum does not change the governing PHI
+mechanics or imply a GitHub merge.
+
+Run `python3 -m pytest -q -rs` from the repository root. The local audit
+recorded 415/415 passing cases with zero skips, including 235 added regression
+cases and two C11 reference comparators totaling 44,000 decisions. Full
+source and bounded verification remain subject to the limits in the review
+document: no physical evidence authentication, process-global atomicity,
+or general-purpose malicious Python isolation is claimed.

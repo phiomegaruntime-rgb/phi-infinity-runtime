@@ -20,6 +20,7 @@ No PHI core equation is changed.
 from dataclasses import dataclass
 
 import numpy as np
+from src.effect_authorization import authorized_effect
 
 
 class UnresolvedExternalFieldError(RuntimeError):
@@ -578,6 +579,7 @@ def _step_with_boundary_phi_mechanics(
             ),
     }
 
+@authorized_effect
 def step_with_boundary(
     engine,
     *args,
